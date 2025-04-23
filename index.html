@@ -3,7 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Daniel Jandric - Executive Profile</title>
+    <title>Daniel Jandric - Executive Profile | COO / CFO</title>
+    <meta name="description" content="Profile of Daniel Jandric, an adaptable Executive Leader (COO/CFO) with expertise in financial strategy, operational transformation, and strategic management across industries.">
+    <meta name="robots" content="index, follow">
+
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -26,7 +29,7 @@
             content: '•';
             position: absolute;
             left: 0;
-            top: 0;
+            top: 0.1em; /* Fine-tune vertical alignment */
             color: inherit; /* Use text color for bullet */
             font-size: 1em;
         }
@@ -34,6 +37,68 @@
              list-style: none;
              padding-left: 0;
         }
+        /* Timeline styles */
+        .timeline-item {
+            position: relative;
+            padding-left: 2.5rem; /* Space for icon and line */
+            padding-bottom: 2rem;
+        }
+        .timeline-item:last-child {
+            padding-bottom: 0;
+        }
+        /* Vertical line */
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: 0.60rem; /* Center the line */
+            top: 0.25rem;
+            bottom: -0.25rem; /* Extend line slightly below icon */
+            width: 2px;
+            background-color: #93a1a1; /* Solarized Base1 */
+            z-index: 0; /* Ensure line is behind potential icon */
+        }
+        .timeline-item:last-child::before {
+             height: 0.5rem; /* Shorter line for the last item */
+             bottom: auto;
+        }
+        /* Timeline icon (dot) */
+        .timeline-icon {
+            position: absolute;
+            left: 0;
+            top: 0.25rem;
+            width: 1.25rem;
+            height: 1.25rem;
+            background-color: #268bd2; /* Solarized Blue */
+            border-radius: 50%;
+            border: 2px solid #fdf6e4; /* Solarized Base3 */
+            z-index: 1; /* Icon above the line */
+        }
+        /* Hide icon for all items EXCEPT the first one (current position) */
+        .timeline-item:not(:first-child) .timeline-icon {
+            display: none;
+        }
+        /* Adjust line position for items without an icon */
+        .timeline-item:not(:first-child)::before {
+             top: 0; /* Start line from the top */
+             bottom: 0; /* End line at the bottom */
+        }
+         /* Adjust line position for the last item if it doesn't have an icon */
+        .timeline-item:last-child:not(:first-child)::before {
+             height: 1em; /* Adjust height to align better with text */
+             bottom: auto;
+        }
+
+        /* Animation classes */
+        .reveal-on-scroll {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+        }
+        .reveal-on-scroll.is-visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
         /* Solarized Light Colors are applied via Tailwind utility classes */
     </style>
 </head>
@@ -46,6 +111,7 @@
                 <a href="#about" class="text-[#657b83] hover:text-[#268bd2] px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200">About</a>
                 <a href="#skills" class="text-[#657b83] hover:text-[#268bd2] px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200">Skills</a>
                 <a href="#experience" class="text-[#657b83] hover:text-[#268bd2] px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200">Experience</a>
+                <a href="#timeline" class="text-[#657b83] hover:text-[#268bd2] px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200">Timeline</a>
                 <a href="#contact" class="text-[#657b83] hover:text-[#268bd2] px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200">Contact</a>
             </div>
         </div>
@@ -64,19 +130,13 @@
         <div class="container mx-auto px-6 text-center relative z-10">
              <img src="https://raw.githubusercontent.com/DanielJandric/danieljandric/main/MM.jpg"
                  alt="Profile photo of Daniel Jandric"
-                 class="w-24 h-24 md:w-32 md:h-32 rounded-full mx-auto mb-6 border-4 border-[#fdf6e4]/70 shadow-lg object-cover"
-                 onerror="this.onerror=null; this.src='https://placehold.co/128x128/fdf6e4/586e75?text=DJ';">
-            <h1 class="text-4xl md:text-5xl font-bold mb-3 text-white">Daniel Jandric</h1>
-            <p class="text-xl md:text-2xl font-light text-[#eee8d5]">Executive Leader | COO / CFO</p>
-            <p class="mt-4 text-lg max-w-3xl mx-auto text-[#eee8d5]">Transformational leader with proven expertise in finance and operations, adaptable across all industries.</p>
-        </div>
+                 class="w-24 h-24 md:w-32 md:h-32 rounded-full mx-auto mb-6 border-4 border-[#fdf6e4]/70 shadow-lg object-cover reveal-on-scroll" onerror="this.onerror=null; this.src='https://placehold.co/128x128/fdf6e4/586e75?text=DJ';">
+            <h1 class="text-4xl md:text-5xl font-bold mb-3 text-white reveal-on-scroll" style="transition-delay: 100ms;">Daniel Jandric</h1> <p class="text-xl md:text-2xl font-light text-[#eee8d5] reveal-on-scroll" style="transition-delay: 200ms;">Executive Leader | COO / CFO</p> <p class="mt-4 text-lg max-w-3xl mx-auto text-[#eee8d5] reveal-on-scroll" style="transition-delay: 300ms;">Transformational leader with proven expertise in finance and operations, adaptable across all industries.</p> </div>
     </header>
 
     <section id="about" class="py-16 md:py-24 bg-[#eee8d5]">
         <div class="container mx-auto px-6">
-            <h2 class="text-3xl font-semibold text-center text-[#073642] mb-12">About Me</h2>
-            <div class="max-w-4xl mx-auto text-center text-lg text-[#586e75] leading-relaxed">
-                <p class="mb-6">
+            <h2 class="text-3xl font-semibold text-center text-[#073642] mb-12 reveal-on-scroll">About Me</h2> <div class="max-w-4xl mx-auto text-center text-lg text-[#586e75] leading-relaxed reveal-on-scroll" style="transition-delay: 100ms;"> <p class="mb-6">
                     With over 15 years of distinguished leadership experience as a Senior Executive (CFO/COO) across listed companies, private equity-backed ventures, and in the infrastructure and real estate sectors, I have a demonstrable track record in driving operational transformation, corporate finance, and strategic management within complex environments.
                 </p>
                 <p class="mb-6">
@@ -91,30 +151,23 @@
 
     <section id="skills" class="py-16 md:py-24 bg-[#fdf6e4]">
         <div class="container mx-auto px-6">
-            <h2 class="text-3xl font-semibold text-center text-[#073642] mb-12">Key Skills</h2>
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                <div class="bg-[#eee8d5] p-6 rounded-lg shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col h-full border border-[#93a1a1]/30">
-                    <h3 class="text-xl font-semibold text-[#268bd2] mb-3">Financial Leadership</h3>
+            <h2 class="text-3xl font-semibold text-center text-[#073642] mb-12 reveal-on-scroll">Key Skills</h2> <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div class="bg-[#eee8d5] p-6 rounded-lg shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col h-full border border-[#93a1a1]/30 reveal-on-scroll"> <h3 class="text-xl font-semibold text-[#268bd2] mb-3">Financial Leadership</h3>
                     <p class="text-[#657b83] flex-grow">Mastery of complex financial systems, strategic planning, investment management (real estate, private equity), IFRS accounting, reporting, and financial transparency.</p>
                 </div>
-                <div class="bg-[#eee8d5] p-6 rounded-lg shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col h-full border border-[#93a1a1]/30">
-                    <h3 class="text-xl font-semibold text-[#268bd2] mb-3">Operational Excellence</h3>
+                <div class="bg-[#eee8d5] p-6 rounded-lg shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col h-full border border-[#93a1a1]/30 reveal-on-scroll" style="transition-delay: 100ms;"> <h3 class="text-xl font-semibold text-[#268bd2] mb-3">Operational Excellence</h3>
                     <p class="text-[#657b83] flex-grow">Optimization of operational frameworks, standardization of business processes, implementation of Shared Services Centers (SSC), ERP implementation, efficiency improvements.</p>
                 </div>
-                <div class="bg-[#eee8d5] p-6 rounded-lg shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col h-full border border-[#93a1a1]/30">
-                    <h3 class="text-xl font-semibold text-[#268bd2] mb-3">Strategic Transformation</h3>
+                <div class="bg-[#eee8d5] p-6 rounded-lg shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col h-full border border-[#93a1a1]/30 reveal-on-scroll" style="transition-delay: 200ms;"> <h3 class="text-xl font-semibold text-[#268bd2] mb-3">Strategic Transformation</h3>
                     <p class="text-[#657b83] flex-grow">Management of complex mergers & acquisitions, leadership of large-scale organizational changes, management of strategic carve-outs and divestitures (e.g., Infracore CHF 1.1B).</p>
                 </div>
-                <div class="bg-[#eee8d5] p-6 rounded-lg shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col h-full border border-[#93a1a1]/30">
-                    <h3 class="text-xl font-semibold text-[#268bd2] mb-3">Stakeholder Management</h3>
+                <div class="bg-[#eee8d5] p-6 rounded-lg shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col h-full border border-[#93a1a1]/30 reveal-on-scroll"> <h3 class="text-xl font-semibold text-[#268bd2] mb-3">Stakeholder Management</h3>
                     <p class="text-[#657b83] flex-grow">Exceptional skills in managing relationships with investors, board members, and operational teams to ensure strategic alignment.</p>
                 </div>
-                <div class="bg-[#eee8d5] p-6 rounded-lg shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col h-full border border-[#93a1a1]/30">
-                    <h3 class="text-xl font-semibold text-[#268bd2] mb-3">Technological Integration</h3>
+                <div class="bg-[#eee8d5] p-6 rounded-lg shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col h-full border border-[#93a1a1]/30 reveal-on-scroll" style="transition-delay: 100ms;"> <h3 class="text-xl font-semibold text-[#268bd2] mb-3">Technological Integration</h3>
                     <p class="text-[#657b83] flex-grow">Expertise in implementing ERP systems (Oracle, SAP), data warehouse (BI) solutions, middleware, and digital transformation initiatives (including AI).</p>
                 </div>
-                 <div class="bg-[#eee8d5] p-6 rounded-lg shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col h-full border border-[#93a1a1]/30">
-                    <h3 class="text-xl font-semibold text-[#268bd2] mb-3">Multilingual Capabilities</h3>
+                 <div class="bg-[#eee8d5] p-6 rounded-lg shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col h-full border border-[#93a1a1]/30 reveal-on-scroll" style="transition-delay: 200ms;"> <h3 class="text-xl font-semibold text-[#268bd2] mb-3">Multilingual Capabilities</h3>
                     <p class="text-[#657b83] flex-grow">Professional proficiency in English, French, and German. Native Croatian speaker. Ability to operate effectively in international environments.</p>
                 </div>
             </div>
@@ -123,10 +176,8 @@
 
     <section id="experience" class="py-16 md:py-24 bg-[#eee8d5]">
         <div class="container mx-auto px-6">
-            <h2 class="text-3xl font-semibold text-center text-[#073642] mb-12">Significant Experience</h2>
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                <div class="bg-[#fdf6e4] p-6 rounded-lg shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col h-full border border-[#93a1a1]/30">
-                    <h3 class="text-xl font-semibold text-[#073642] mb-1">Chief Operating Officer</h3>
+            <h2 class="text-3xl font-semibold text-center text-[#073642] mb-12 reveal-on-scroll">Significant Experience</h2> <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div class="bg-[#fdf6e4] p-6 rounded-lg shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col h-full border border-[#93a1a1]/30 reveal-on-scroll"> <h3 class="text-xl font-semibold text-[#073642] mb-1">Chief Operating Officer</h3>
                     <p class="text-sm text-[#839496] mb-3">BE Capital SA | Oct 2023 - Present</p>
                     <ul class="text-[#586e75] space-y-1 card-list flex-grow">
                         <li>Oversee asset allocation & performance (Family Office).</li>
@@ -135,8 +186,7 @@
                          <li>Preparing new carve-out and IPO (REIT).</li>
                     </ul>
                 </div>
-                <div class="bg-[#fdf6e4] p-6 rounded-lg shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col h-full border border-[#93a1a1]/30">
-                    <h3 class="text-xl font-semibold text-[#073642] mb-1">Chief Financial Officer</h3>
+                <div class="bg-[#fdf6e4] p-6 rounded-lg shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col h-full border border-[#93a1a1]/30 reveal-on-scroll" style="transition-delay: 100ms;"> <h3 class="text-xl font-semibold text-[#073642] mb-1">Chief Financial Officer</h3>
                     <p class="text-sm text-[#839496] mb-3">Investis Holding SA | Oct 2021 - Oct 2023</p>
                     <ul class="text-[#586e75] space-y-1 card-list flex-grow">
                         <li>Created Valores Shared Service Center (Finance, HR, IT).</li>
@@ -145,8 +195,7 @@
                         <li>ERP implementation, improved EBITDA margin (+15%).</li>
                     </ul>
                 </div>
-                <div class="bg-[#fdf6e4] p-6 rounded-lg shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col h-full border border-[#93a1a1]/30">
-                    <h3 class="text-xl font-semibold text-[#073642] mb-1">Chief Executive Officer</h3>
+                <div class="bg-[#fdf6e4] p-6 rounded-lg shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col h-full border border-[#93a1a1]/30 reveal-on-scroll" style="transition-delay: 200ms;"> <h3 class="text-xl font-semibold text-[#073642] mb-1">Chief Executive Officer</h3>
                     <p class="text-sm text-[#839496] mb-3">Infracore SA (AEVIS Victoria) | May 2018 - Oct 2021</p>
                     <ul class="text-[#586e75] space-y-1 card-list flex-grow">
                         <li>Executed carve-out and sale (CHF 1.1B) to La Baloise/MPT.</li>
@@ -155,8 +204,7 @@
                         <li>Raised institutional capital.</li>
                     </ul>
                 </div>
-                 <div class="bg-[#fdf6e4] p-6 rounded-lg shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col h-full border border-[#93a1a1]/30">
-                    <h3 class="text-xl font-semibold text-[#073642] mb-1">CFO / COO (Previous Roles)</h3>
+                 <div class="bg-[#fdf6e4] p-6 rounded-lg shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col h-full border border-[#93a1a1]/30 reveal-on-scroll"> <h3 class="text-xl font-semibold text-[#073642] mb-1">CFO / COO (Previous Roles)</h3>
                     <p class="text-sm text-[#839496] mb-3">AEVIS Victoria / Swiss Medical Network | 2014 - 2018</p>
                     <ul class="text-[#586e75] space-y-1 card-list flex-grow">
                         <li>Standardized operations and financial processes.</li>
@@ -169,17 +217,54 @@
         </div>
     </section>
 
+    <section id="timeline" class="py-16 md:py-24 bg-[#fdf6e4]">
+        <div class="container mx-auto px-6">
+            <h2 class="text-3xl font-semibold text-center text-[#073642] mb-16 reveal-on-scroll">Career Timeline</h2> <div class="relative max-w-3xl mx-auto">
+                <div class="timeline-item reveal-on-scroll"> <div class="timeline-icon"></div>
+                    <h3 class="text-xl font-semibold text-[#073642] mb-1">Chief Operating Officer</h3>
+                    <p class="text-sm font-medium text-[#839496] mb-2">BE Capital SA | Lausanne | Oct 2023 - Present</p>
+                    <p class="text-[#586e75]">Oversee asset strategy for family office, advise principal shareholder of Investis Holding SA, drive process optimization (CHF 2M savings), prepare new REIT IPO.</p>
+                </div>
+                <div class="timeline-item reveal-on-scroll"> <div class="timeline-icon"></div>
+                    <h3 class="text-xl font-semibold text-[#073642] mb-1">Chief Financial Officer, Real Estate Services</h3>
+                    <p class="text-sm font-medium text-[#839496] mb-2">Investis Holding SA | Zurich | Oct 2021 - Oct 2023</p>
+                    <p class="text-[#586e75]">Created Valores Shared Service Center (Finance, HR, IT), achieving CHF 10M annual savings. Led CHF 240M sale of Real Estate Services. Implemented ERP, improving EBITDA margins by 15%.</p>
+                </div>
+                <div class="timeline-item reveal-on-scroll"> <div class="timeline-icon"></div>
+                    <h3 class="text-xl font-semibold text-[#073642] mb-1">Chief Executive Officer</h3>
+                    <p class="text-sm font-medium text-[#839496] mb-2">Infracore SA (AEVIS Victoria Group) | Fribourg | May 2018 - Oct 2021</p>
+                    <p class="text-[#586e75]">Led CHF 1.1B carve-out and sale to La Baloise/Medical Properties Trust. Managed 40 properties (~180,000 sqm). Implemented BI tools, reducing operational costs by 10%.</p>
+                </div>
+                <div class="timeline-item reveal-on-scroll"> <div class="timeline-icon"></div>
+                    <h3 class="text-xl font-semibold text-[#073642] mb-1">Chief Operating Officer</h3>
+                    <p class="text-sm font-medium text-[#839496] mb-2">AEVIS VICTORIA SA | Zurich | May 2016 - May 2018</p>
+                    <p class="text-[#586e75]">Standardized operations across subsidiaries, saving over CHF 5M via process alignment. Built scalable platforms and fostered a unified culture.</p>
+                </div>
+                <div class="timeline-item reveal-on-scroll"> <div class="timeline-icon"></div>
+                    <h3 class="text-xl font-semibold text-[#073642] mb-1">Chief Financial Officer</h3>
+                    <p class="text-sm font-medium text-[#839496] mb-2">Swiss Medical Network SA (AEVIS Victoria Group) | Genolier | Apr 2014 - May 2016</p>
+                    <p class="text-[#586e75]">Integrated ERP (Project Oxygen, -20% DSO), led BI initiative (-7-10% costs), unified procurement (CHF 17M savings), expanded network (11 to 20 hospitals), implemented middleware (Project Fluance).</p>
+                </div>
+                 <div class="timeline-item reveal-on-scroll"> <div class="timeline-icon"></div>
+                    <h3 class="text-xl font-semibold text-[#073642] mb-1">Projects Finance Manager</h3>
+                    <p class="text-sm font-medium text-[#839496] mb-2">Boart Longyear | Switzerland | 2011 - 2014</p>
+                    <p class="text-[#586e75]">Directed complex global financial consolidations and participated in Oracle ERP rollout (Project OneCore).</p>
+                </div>
+                 <div class="timeline-item reveal-on-scroll"> <div class="timeline-icon"></div>
+                    <h3 class="text-xl font-semibold text-[#073642] mb-1">Finance & Accounting Manager</h3>
+                    <p class="text-sm font-medium text-[#839496] mb-2">Navori Labs | Lausanne | 2009 - 2011</p>
+                    <p class="text-[#586e75]">Managed end-to-end financial planning, reporting, and audits (FP&A focus).</p>
+                </div>
+            </div> </div>
+    </section>
+
     <section id="contact" class="py-16 md:py-24 bg-gradient-to-r from-[#2aa198] to-[#268bd2] text-[#fdf6e4]">
         <div class="container mx-auto px-6 text-center">
-            <h2 class="text-3xl font-semibold mb-8 text-white">Contact Me</h2>
-            <p class="text-lg mb-4 text-[#eee8d5]">Ready to discuss new challenges and opportunities.</p>
-            <div class="flex flex-col md:flex-row justify-center items-center space-y-4 md:space-y-0 md:space-x-8 text-lg text-[#fdf6e4]">
-                <a href="mailto:daniel.jandric@me.com" class="hover:text-[#b58900] hover:underline transition-colors duration-200">daniel.jandric@me.com</a>
+            <h2 class="text-3xl font-semibold mb-8 text-white reveal-on-scroll">Contact Me</h2> <p class="text-lg mb-4 text-[#eee8d5] reveal-on-scroll" style="transition-delay: 100ms;">Ready to discuss new challenges and opportunities.</p> <div class="flex flex-col md:flex-row justify-center items-center space-y-4 md:space-y-0 md:space-x-8 text-lg text-[#fdf6e4] reveal-on-scroll" style="transition-delay: 200ms;"> <a href="mailto:daniel.jandric@me.com" class="hover:text-[#b58900] hover:underline transition-colors duration-200">daniel.jandric@me.com</a>
                 <span>+41 79 865 52 50</span>
                 <a href="https://linkedin.com/in/daniel-jandric-b7194840" target="_blank" rel="noopener noreferrer" class="hover:text-[#b58900] hover:underline transition-colors duration-200">LinkedIn Profile</a>
             </div>
-            <p class="mt-6 text-sm text-[#eee8d5]">Based in Echichens, Switzerland</p>
-        </div>
+            <p class="mt-6 text-sm text-[#eee8d5] reveal-on-scroll" style="transition-delay: 300ms;">Based in Echichens, Switzerland</p> </div>
     </section>
 
     <footer class="bg-[#eee8d5] text-[#839496] py-6">
@@ -187,6 +272,44 @@
             &copy; 2025 Daniel Jandric. All rights reserved.
         </div>
     </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Select all elements intended for reveal animation
+            const revealElements = document.querySelectorAll('.reveal-on-scroll');
+
+            // Configuration for the Intersection Observer
+            const observerOptions = {
+                root: null, // Use the viewport as the root
+                rootMargin: '0px',
+                threshold: 0.1 // Trigger when 10% of the element is visible
+            };
+
+            // Callback function for the observer
+            const observerCallback = (entries, observer) => {
+                entries.forEach(entry => {
+                    // If the element is intersecting (visible)
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('is-visible');
+                        // Optional: Stop observing the element after it's revealed
+                        observer.unobserve(entry.target);
+                    }
+                    // Optional: If you want elements to hide again when they scroll out
+                    // else {
+                    //     entry.target.classList.remove('is-visible');
+                    // }
+                });
+            };
+
+            // Create the Intersection Observer
+            const observer = new IntersectionObserver(observerCallback, observerOptions);
+
+            // Observe each target element
+            revealElements.forEach(el => {
+                observer.observe(el);
+            });
+        });
+    </script>
 
 </body>
 </html>
