@@ -19,62 +19,63 @@
         }
         /* Ensure list items inside cards are aligned */
         .card-list li {
-            /* Adjust margin as needed if list-disc is used */
-            position: relative; /* Needed for absolute positioning of the bullet */
-            padding-left: 1.25rem; /* Space for the bullet */
+            position: relative;
+            padding-left: 1.25rem;
         }
         .card-list li::before {
-            content: '•'; /* Bullet character */
+            content: '•';
             position: absolute;
             left: 0;
-            top: 0; /* Adjust vertical alignment if necessary */
-            color: inherit; /* Inherit text color */
-            font-size: 1em; /* Adjust bullet size if necessary */
+            top: 0;
+            color: inherit; /* Use text color for bullet */
+            font-size: 1em;
         }
         .card-list {
-             list-style: none; /* Remove default list style */
-             padding-left: 0; /* Reset default padding */
+             list-style: none;
+             padding-left: 0;
         }
+        /* Solarized Light Colors are applied via Tailwind utility classes */
     </style>
 </head>
-<body class="bg-slate-50 text-slate-800">
+<body class="bg-[#fdf6e4] text-[#586e75]">
 
-    <nav class="bg-white shadow-sm sticky top-0 z-50">
+    <nav class="bg-[#eee8d5] shadow-sm sticky top-0 z-50">
         <div class="container mx-auto px-6 py-3 flex justify-between items-center">
-            <div class="text-xl font-semibold text-slate-700">Daniel Jandric</div>
+            <div class="text-xl font-semibold text-[#073642]">Daniel Jandric</div>
             <div>
-                <a href="#about" class="text-slate-600 hover:text-sky-600 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200">About</a>
-                <a href="#skills" class="text-slate-600 hover:text-sky-600 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200">Skills</a>
-                <a href="#experience" class="text-slate-600 hover:text-sky-600 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200">Experience</a>
-                <a href="#contact" class="text-slate-600 hover:text-sky-600 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200">Contact</a>
+                <a href="#about" class="text-[#657b83] hover:text-[#268bd2] px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200">About</a>
+                <a href="#skills" class="text-[#657b83] hover:text-[#268bd2] px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200">Skills</a>
+                <a href="#experience" class="text-[#657b83] hover:text-[#268bd2] px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200">Experience</a>
+                <a href="#contact" class="text-[#657b83] hover:text-[#268bd2] px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200">Contact</a>
             </div>
         </div>
     </nav>
 
-    <header class="relative bg-gradient-to-r from-sky-600 to-slate-700 text-white py-20 md:py-32 overflow-hidden">
+    <header class="relative bg-gradient-to-r from-[#2aa198] to-[#268bd2] text-[#fdf6e4] py-20 md:py-32 overflow-hidden">
         <div class="absolute inset-0 z-0">
              <img src="https://raw.githubusercontent.com/DanielJandric/danieljandric/main/MM.jpg"
                  alt="Background portrait of Daniel Jandric"
-                 class="w-full h-full object-cover opacity-15 md:opacity-20"
+                 class="w-full h-full object-cover opacity-10 md:opacity-15"
                  onerror="this.style.display='none';"
                  >
-             <div class="absolute inset-0 bg-gradient-to-r from-sky-700/40 to-slate-800/50"></div>
+             <div class="absolute inset-0 bg-gradient-to-r from-[#2aa198]/30 to-[#268bd2]/40"></div>
         </div>
 
         <div class="container mx-auto px-6 text-center relative z-10">
              <img src="https://raw.githubusercontent.com/DanielJandric/danieljandric/main/MM.jpg"
                  alt="Profile photo of Daniel Jandric"
-                 class="w-24 h-24 md:w-32 md:h-32 rounded-full mx-auto mb-6 border-4 border-white/80 shadow-lg object-cover" onerror="this.onerror=null; this.src='https://placehold.co/128x128/E2E8F0/4A5568?text=DJ';">
-            <h1 class="text-4xl md:text-5xl font-bold mb-3">Daniel Jandric</h1>
-            <p class="text-xl md:text-2xl font-light">Executive Leader | COO / CFO</p>
-            <p class="mt-4 text-lg max-w-3xl mx-auto text-slate-100">Transformational leader with proven expertise in finance and operations, adaptable across all industries.</p>
+                 class="w-24 h-24 md:w-32 md:h-32 rounded-full mx-auto mb-6 border-4 border-[#fdf6e4]/70 shadow-lg object-cover"
+                 onerror="this.onerror=null; this.src='https://placehold.co/128x128/fdf6e4/586e75?text=DJ';">
+            <h1 class="text-4xl md:text-5xl font-bold mb-3 text-white">Daniel Jandric</h1>
+            <p class="text-xl md:text-2xl font-light text-[#eee8d5]">Executive Leader | COO / CFO</p>
+            <p class="mt-4 text-lg max-w-3xl mx-auto text-[#eee8d5]">Transformational leader with proven expertise in finance and operations, adaptable across all industries.</p>
         </div>
     </header>
 
-    <section id="about" class="py-16 md:py-24 bg-white">
+    <section id="about" class="py-16 md:py-24 bg-[#eee8d5]">
         <div class="container mx-auto px-6">
-            <h2 class="text-3xl font-semibold text-center text-slate-800 mb-12">About Me</h2>
-            <div class="max-w-4xl mx-auto text-center text-lg text-slate-700 leading-relaxed">
+            <h2 class="text-3xl font-semibold text-center text-[#073642] mb-12">About Me</h2>
+            <div class="max-w-4xl mx-auto text-center text-lg text-[#586e75] leading-relaxed">
                 <p class="mb-6">
                     With over 15 years of distinguished leadership experience as a Senior Executive (CFO/COO) across listed companies, private equity-backed ventures, and in the infrastructure and real estate sectors, I have a demonstrable track record in driving operational transformation, corporate finance, and strategic management within complex environments.
                 </p>
@@ -88,76 +89,76 @@
         </div>
     </section>
 
-    <section id="skills" class="py-16 md:py-24 bg-slate-50">
+    <section id="skills" class="py-16 md:py-24 bg-[#fdf6e4]">
         <div class="container mx-auto px-6">
-            <h2 class="text-3xl font-semibold text-center text-slate-800 mb-12">Key Skills</h2>
+            <h2 class="text-3xl font-semibold text-center text-[#073642] mb-12">Key Skills</h2>
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                <div class="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 flex flex-col h-full">
-                    <h3 class="text-xl font-semibold text-sky-700 mb-3">Financial Leadership</h3>
-                    <p class="text-slate-600 flex-grow">Mastery of complex financial systems, strategic planning, investment management (real estate, private equity), IFRS accounting, reporting, and financial transparency.</p>
+                <div class="bg-[#eee8d5] p-6 rounded-lg shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col h-full border border-[#93a1a1]/30">
+                    <h3 class="text-xl font-semibold text-[#268bd2] mb-3">Financial Leadership</h3>
+                    <p class="text-[#657b83] flex-grow">Mastery of complex financial systems, strategic planning, investment management (real estate, private equity), IFRS accounting, reporting, and financial transparency.</p>
                 </div>
-                <div class="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 flex flex-col h-full">
-                    <h3 class="text-xl font-semibold text-sky-700 mb-3">Operational Excellence</h3>
-                    <p class="text-slate-600 flex-grow">Optimization of operational frameworks, standardization of business processes, implementation of Shared Services Centers (SSC), ERP implementation, efficiency improvements.</p>
+                <div class="bg-[#eee8d5] p-6 rounded-lg shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col h-full border border-[#93a1a1]/30">
+                    <h3 class="text-xl font-semibold text-[#268bd2] mb-3">Operational Excellence</h3>
+                    <p class="text-[#657b83] flex-grow">Optimization of operational frameworks, standardization of business processes, implementation of Shared Services Centers (SSC), ERP implementation, efficiency improvements.</p>
                 </div>
-                <div class="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 flex flex-col h-full">
-                    <h3 class="text-xl font-semibold text-sky-700 mb-3">Strategic Transformation</h3>
-                    <p class="text-slate-600 flex-grow">Management of complex mergers & acquisitions, leadership of large-scale organizational changes, management of strategic carve-outs and divestitures (e.g., Infracore CHF 1.1B).</p>
+                <div class="bg-[#eee8d5] p-6 rounded-lg shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col h-full border border-[#93a1a1]/30">
+                    <h3 class="text-xl font-semibold text-[#268bd2] mb-3">Strategic Transformation</h3>
+                    <p class="text-[#657b83] flex-grow">Management of complex mergers & acquisitions, leadership of large-scale organizational changes, management of strategic carve-outs and divestitures (e.g., Infracore CHF 1.1B).</p>
                 </div>
-                <div class="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 flex flex-col h-full">
-                    <h3 class="text-xl font-semibold text-sky-700 mb-3">Stakeholder Management</h3>
-                    <p class="text-slate-600 flex-grow">Exceptional skills in managing relationships with investors, board members, and operational teams to ensure strategic alignment.</p>
+                <div class="bg-[#eee8d5] p-6 rounded-lg shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col h-full border border-[#93a1a1]/30">
+                    <h3 class="text-xl font-semibold text-[#268bd2] mb-3">Stakeholder Management</h3>
+                    <p class="text-[#657b83] flex-grow">Exceptional skills in managing relationships with investors, board members, and operational teams to ensure strategic alignment.</p>
                 </div>
-                <div class="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 flex flex-col h-full">
-                    <h3 class="text-xl font-semibold text-sky-700 mb-3">Technological Integration</h3>
-                    <p class="text-slate-600 flex-grow">Expertise in implementing ERP systems (Oracle, SAP), data warehouse (BI) solutions, middleware, and digital transformation initiatives (including AI).</p>
+                <div class="bg-[#eee8d5] p-6 rounded-lg shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col h-full border border-[#93a1a1]/30">
+                    <h3 class="text-xl font-semibold text-[#268bd2] mb-3">Technological Integration</h3>
+                    <p class="text-[#657b83] flex-grow">Expertise in implementing ERP systems (Oracle, SAP), data warehouse (BI) solutions, middleware, and digital transformation initiatives (including AI).</p>
                 </div>
-                 <div class="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 flex flex-col h-full">
-                    <h3 class="text-xl font-semibold text-sky-700 mb-3">Multilingual Capabilities</h3>
-                    <p class="text-slate-600 flex-grow">Professional proficiency in English, French, and German. Native Croatian speaker. Ability to operate effectively in international environments.</p>
+                 <div class="bg-[#eee8d5] p-6 rounded-lg shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col h-full border border-[#93a1a1]/30">
+                    <h3 class="text-xl font-semibold text-[#268bd2] mb-3">Multilingual Capabilities</h3>
+                    <p class="text-[#657b83] flex-grow">Professional proficiency in English, French, and German. Native Croatian speaker. Ability to operate effectively in international environments.</p>
                 </div>
             </div>
         </div>
     </section>
 
-    <section id="experience" class="py-16 md:py-24 bg-white">
+    <section id="experience" class="py-16 md:py-24 bg-[#eee8d5]">
         <div class="container mx-auto px-6">
-            <h2 class="text-3xl font-semibold text-center text-slate-800 mb-12">Significant Experience</h2>
+            <h2 class="text-3xl font-semibold text-center text-[#073642] mb-12">Significant Experience</h2>
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                <div class="bg-slate-50 p-6 rounded-lg shadow-sm border border-slate-200 hover:shadow-md transition-shadow duration-300 flex flex-col h-full">
-                    <h3 class="text-xl font-semibold text-slate-700 mb-1">Chief Operating Officer</h3>
-                    <p class="text-sm text-slate-500 mb-3">BE Capital SA | Oct 2023 - Present</p>
-                    <ul class="text-slate-600 space-y-1 card-list flex-grow">
+                <div class="bg-[#fdf6e4] p-6 rounded-lg shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col h-full border border-[#93a1a1]/30">
+                    <h3 class="text-xl font-semibold text-[#073642] mb-1">Chief Operating Officer</h3>
+                    <p class="text-sm text-[#839496] mb-3">BE Capital SA | Oct 2023 - Present</p>
+                    <ul class="text-[#586e75] space-y-1 card-list flex-grow">
                         <li>Oversee asset allocation & performance (Family Office).</li>
                         <li>Advisor to the principal shareholder of Investis Holding SA.</li>
                         <li>Process optimization (CHF 2M annual savings).</li>
                          <li>Preparing new carve-out and IPO (REIT).</li>
                     </ul>
                 </div>
-                <div class="bg-slate-50 p-6 rounded-lg shadow-sm border border-slate-200 hover:shadow-md transition-shadow duration-300 flex flex-col h-full">
-                    <h3 class="text-xl font-semibold text-slate-700 mb-1">Chief Financial Officer</h3>
-                    <p class="text-sm text-slate-500 mb-3">Investis Holding SA | Oct 2021 - Oct 2023</p>
-                    <ul class="text-slate-600 space-y-1 card-list flex-grow">
+                <div class="bg-[#fdf6e4] p-6 rounded-lg shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col h-full border border-[#93a1a1]/30">
+                    <h3 class="text-xl font-semibold text-[#073642] mb-1">Chief Financial Officer</h3>
+                    <p class="text-sm text-[#839496] mb-3">Investis Holding SA | Oct 2021 - Oct 2023</p>
+                    <ul class="text-[#586e75] space-y-1 card-list flex-grow">
                         <li>Created Valores Shared Service Center (Finance, HR, IT).</li>
                         <li>CHF 10M annual savings via centralization.</li>
                         <li>Led sale of Real Estate Services (CHF 240M).</li>
                         <li>ERP implementation, improved EBITDA margin (+15%).</li>
                     </ul>
                 </div>
-                <div class="bg-slate-50 p-6 rounded-lg shadow-sm border border-slate-200 hover:shadow-md transition-shadow duration-300 flex flex-col h-full">
-                    <h3 class="text-xl font-semibold text-slate-700 mb-1">Chief Executive Officer</h3>
-                    <p class="text-sm text-slate-500 mb-3">Infracore SA (AEVIS Victoria) | May 2018 - Oct 2021</p>
-                    <ul class="text-slate-600 space-y-1 card-list flex-grow">
+                <div class="bg-[#fdf6e4] p-6 rounded-lg shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col h-full border border-[#93a1a1]/30">
+                    <h3 class="text-xl font-semibold text-[#073642] mb-1">Chief Executive Officer</h3>
+                    <p class="text-sm text-[#839496] mb-3">Infracore SA (AEVIS Victoria) | May 2018 - Oct 2021</p>
+                    <ul class="text-[#586e75] space-y-1 card-list flex-grow">
                         <li>Executed carve-out and sale (CHF 1.1B) to La Baloise/MPT.</li>
                         <li>Managed 40 properties (~180,000 sqm).</li>
                         <li>Implemented BI tools (-10% operational costs).</li>
                         <li>Raised institutional capital.</li>
                     </ul>
                 </div>
-                 <div class="bg-slate-50 p-6 rounded-lg shadow-sm border border-slate-200 hover:shadow-md transition-shadow duration-300 flex flex-col h-full">
-                    <h3 class="text-xl font-semibold text-slate-700 mb-1">CFO / COO (Previous Roles)</h3>
-                    <p class="text-sm text-slate-500 mb-3">AEVIS Victoria / Swiss Medical Network | 2014 - 2018</p>
-                    <ul class="text-slate-600 space-y-1 card-list flex-grow">
+                 <div class="bg-[#fdf6e4] p-6 rounded-lg shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col h-full border border-[#93a1a1]/30">
+                    <h3 class="text-xl font-semibold text-[#073642] mb-1">CFO / COO (Previous Roles)</h3>
+                    <p class="text-sm text-[#839496] mb-3">AEVIS Victoria / Swiss Medical Network | 2014 - 2018</p>
+                    <ul class="text-[#586e75] space-y-1 card-list flex-grow">
                         <li>Standardized operations and financial processes.</li>
                         <li>Post-acquisition financial integration (network grew from 11 to 20 hospitals).</li>
                         <li>BI projects and procurement optimization (CHF 17M savings).</li>
@@ -168,20 +169,20 @@
         </div>
     </section>
 
-    <section id="contact" class="py-16 md:py-24 bg-gradient-to-r from-sky-600 to-slate-700 text-white">
+    <section id="contact" class="py-16 md:py-24 bg-gradient-to-r from-[#2aa198] to-[#268bd2] text-[#fdf6e4]">
         <div class="container mx-auto px-6 text-center">
-            <h2 class="text-3xl font-semibold mb-8">Contact Me</h2>
-            <p class="text-lg mb-4 text-slate-100">Ready to discuss new challenges and opportunities.</p>
-            <div class="flex flex-col md:flex-row justify-center items-center space-y-4 md:space-y-0 md:space-x-8 text-lg text-slate-50">
-                <a href="mailto:daniel.jandric@me.com" class="hover:text-sky-200 hover:underline transition-colors duration-200">daniel.jandric@me.com</a>
+            <h2 class="text-3xl font-semibold mb-8 text-white">Contact Me</h2>
+            <p class="text-lg mb-4 text-[#eee8d5]">Ready to discuss new challenges and opportunities.</p>
+            <div class="flex flex-col md:flex-row justify-center items-center space-y-4 md:space-y-0 md:space-x-8 text-lg text-[#fdf6e4]">
+                <a href="mailto:daniel.jandric@me.com" class="hover:text-[#b58900] hover:underline transition-colors duration-200">daniel.jandric@me.com</a>
                 <span>+41 79 865 52 50</span>
-                <a href="https://linkedin.com/in/daniel-jandric-b7194840" target="_blank" rel="noopener noreferrer" class="hover:text-sky-200 hover:underline transition-colors duration-200">LinkedIn Profile</a>
+                <a href="https://linkedin.com/in/daniel-jandric-b7194840" target="_blank" rel="noopener noreferrer" class="hover:text-[#b58900] hover:underline transition-colors duration-200">LinkedIn Profile</a>
             </div>
-            <p class="mt-6 text-sm text-slate-300">Based in Echichens, Switzerland</p>
+            <p class="mt-6 text-sm text-[#eee8d5]">Based in Echichens, Switzerland</p>
         </div>
     </section>
 
-    <footer class="bg-slate-800 text-slate-400 py-6">
+    <footer class="bg-[#eee8d5] text-[#839496] py-6">
         <div class="container mx-auto px-6 text-center text-sm">
             &copy; 2025 Daniel Jandric. All rights reserved.
         </div>
