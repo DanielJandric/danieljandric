@@ -1,0 +1,555 @@
+import React, { useState } from 'react';
+// Import necessary components from recharts
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, LineChart, Line } from 'recharts';
+// Import necessary icons from lucide-react
+import { AlertCircle, CheckCircle, TrendingDown, TrendingUp, FileText, Scale, Home, Wrench, ShieldAlert, FileWarning, Milestone, LogOut, Info } from 'lucide-react';
+
+// --- Mock Components (Simulating shadcn/ui) ---
+// These components provide basic structure and styling if the actual library isn't available.
+// In a real project, you would import these from '@radix-ui/react-tabs', '@radix-ui/react-card', etc., or your UI library.
+
+const Card = ({ children, className = "" }) => (
+  <div className={`bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden ${className}`}>
+    {children}
+  </div>
+);
+const CardHeader = ({ children, className = "" }) => <div className={`p-5 border-b border-gray-100 ${className}`}>{children}</div>;
+const CardTitle = ({ children, className = "" }) => <h3 className={`text-lg font-semibold text-gray-900 flex items-center ${className}`}>{children}</h3>;
+const CardDescription = ({ children, className = "" }) => <p className={`text-sm text-gray-500 mt-1 ${className}`}>{children}</p>;
+const CardContent = ({ children, className = "" }) => <div className={`p-5 text-sm ${className}`}>{children}</div>;
+const CardFooter = ({ children, className = "" }) => <div className={`p-4 bg-gray-50 border-t border-gray-100 text-xs text-gray-600 ${className}`}>{children}</div>;
+
+const Tabs = ({ defaultValue, children, className = "" }) => {
+  const [activeTab, setActiveTab] = useState(defaultValue);
+  // Find TabsList and TabsContent children
+  const tabsList = React.Children.toArray(children).find(child => child.type === TabsList);
+  const tabsContent = React.Children.toArray(children).filter(child => child.type === TabsContent);
+
+  return (
+    <div className={className}>
+      {/* Clone TabsList and pass state control props */}
+      {tabsList && React.cloneElement(tabsList, { activeTab, setActiveTab })}
+      {/* Render the active TabsContent */}
+      {tabsContent.find(content => content.props.value === activeTab)}
+    </div>
+  );
+};
+
+const TabsList = ({ children, className = "", activeTab, setActiveTab }) => (
+  <div className={`flex border-b border-gray-200 ${className}`}>
+    {/* Map over children (TabsTrigger) and pass state control props */}
+    {React.Children.map(children, child =>
+      child.type === TabsTrigger ? React.cloneElement(child, { activeTab, setActiveTab }) : child
+    )}
+  </div>
+);
+
+const TabsTrigger = ({ children, value, className = "", activeTab, setActiveTab }) => (
+  <button
+    onClick={() => setActiveTab(value)}
+    // Apply dynamic styling based on active state
+    className={`px-3 py-2.5 text-sm font-medium leading-none rounded-t-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2
+      ${activeTab === value
+        ? 'border-b-2 border-indigo-600 text-indigo-700 bg-indigo-50' // Active tab style
+        : 'text-gray-500 hover:text-gray-700 hover:bg-gray-100 border-b-2 border-transparent' // Inactive tab style
+      } ${className}`}
+    // ARIA attributes for accessibility
+    role="tab"
+    aria-selected={activeTab === value}
+    aria-controls={`tabpanel-${value}`}
+    id={`tab-${value}`}
+  >
+    {children}
+  </button>
+);
+
+const TabsContent = ({ children, value, className = "" }) => (
+  <div
+    // ARIA attributes for accessibility
+    role="tabpanel"
+    aria-labelledby={`tab-${value}`}
+    id={`tabpanel-${value}`}
+    className={`mt-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ${className}`}
+  >
+    {children}
+  </div>
+);
+
+const Table = ({ children, className = "" }) => <div className="overflow-x-auto"><table className={`w-full text-sm border-collapse ${className}`}>{children}</table></div>;
+const TableHeader = ({ children, className = "" }) => <thead className={`bg-gray-100 ${className}`}>{children}</thead>;
+const TableRow = ({ children, className = "" }) => <tr className={`border-b border-gray-100 hover:bg-gray-50 ${className}`}>{children}</tr>;
+const TableHead = ({ children, className = "" }) => <th className={`p-3 font-medium text-left text-gray-600 ${className}`}>{children}</th>;
+const TableBody = ({ children, className = "" }) => <tbody className={className}>{children}</tbody>;
+const TableCell = ({ children, className = "" }) => <td className={`p-3 text-gray-700 align-top ${className}`}>{children}</td>;
+
+// --- Data Section (Same as before) ---
+
+// Point 1: Chauffage/Climatisation Data
+const chauffageData = [
+  { name: 'Chauffage/ECS', type: 'Coefficients Spécifiques (2007)', base: 'Étude GD Climat 2007' },
+  { name: 'Climatisation', type: 'Coefficients Spécifiques (2007)', base: 'Étude GD Climat 2007 (locaux climatisés)' },
+  { name: 'Autres Charges', type: 'Millièmes PPE', base: 'Standard PPE' },
+];
+
+// Point 2: Participation Le Signal Data
+const signalParticipationData = [
+  { charge: 'Chauffage', participation: 33862.05, annee: 2023 },
+  { charge: 'Eau/Épuration', participation: 3492.20, annee: 2023 },
+  { charge: 'Entretien', participation: 2375.00, annee: 2023 },
+  { charge: 'Salaires', participation: 14888.95, annee: 2023 },
+  { charge: 'Charges Soc.', participation: 2712.40, annee: 2023 },
+  { charge: 'LAA', participation: 446.30, annee: 2023 },
+  { charge: 'Climatisation', participation: 7666.90, annee: 2023 },
+  { charge: 'Outillage Conc.', participation: 297.90, annee: 2023 },
+];
+const totalSignalParticipation2023 = signalParticipationData.reduce((sum, item) => sum + item.participation, 0);
+
+// Point 3: Timeline Data for Le Signal Debt
+const signalDebtTimelineData = [
+  { date: '31.12.2022', event: 'Solde Reporté', amount: 47579.40, balance: 47579.40, type: 'debt' },
+  { date: '03.11.2023', event: 'Acompte Versé', amount: -60000.00, balance: -12420.60, type: 'payment' },
+  { date: '31.12.2023', event: 'Imputation Charges 2023', amount: totalSignalParticipation2023, balance: 54768.60, type: 'charge' },
+];
+
+// Point 4: Concierge Costs 2023 Data
+const conciergeCostsData = [
+  { item: 'Salaires Bruts (estimé)', cost: 205000, signalPart: 14888.95, etoilePart: 190111.05 },
+  { item: 'Charges Sociales Patronales (estimé)', cost: 37000, signalPart: 2712.40, etoilePart: 34287.60 },
+  { item: 'Assurances Accidents (LAA)', cost: 6138, signalPart: 446.30, etoilePart: 5691.70 },
+  { item: 'Outillage/Matériel (partagé)', cost: 4090, signalPart: 297.90, etoilePart: 3792.10 },
+];
+const totalConciergeCost = conciergeCostsData.reduce((sum, item) => sum + item.cost, 0);
+const totalConciergeSignal = conciergeCostsData.reduce((sum, item) => sum + item.signalPart, 0);
+const totalConciergeEtoile = conciergeCostsData.reduce((sum, item) => sum + item.etoilePart, 0);
+
+// Point 5: BE Capital Charges Data (08.02.2024 - 31.12.2024)
+const beCapitalChargesData = [
+  { charge: 'Frais de chauffage (spécifique)', amount: 38150.60 },
+  { charge: 'Charges courantes (140‰ prorata)', amount: 62048.60 },
+  { charge: 'Assainissement urbain (eau/épuration spécifique)', amount: 1834.05 },
+  { charge: 'Total Charges', amount: 102033.25 },
+  { charge: 'Avances Versées/Reprises', amount: -132418.15 },
+  { charge: 'Solde (Créditeur)', amount: -30384.90 },
+];
+
+// --- Helper Components ---
+
+// Reusable Card Component for each analysis point
+const AnalysisCard = ({ point, title, icon: Icon, children }) => (
+  <Card className="mb-8 transition-shadow duration-300 hover:shadow-lg">
+    <CardHeader>
+      <CardTitle className="text-indigo-700">
+        <Icon className="mr-2.5 h-5 w-5" />
+        Point {point}: {title}
+      </CardTitle>
+    </CardHeader>
+    <CardContent>
+      {children}
+    </CardContent>
+  </Card>
+);
+
+// Component to display analysis details with an icon
+const AnalysisDetail = ({ label, children, icon: Icon, className = "" }) => (
+  <div className={`mb-4 p-4 border border-gray-100 rounded-lg bg-gray-50/80 ${className}`}>
+    <h4 className="font-semibold text-gray-700 mb-2 flex items-center text-base">
+      {Icon && <Icon className="mr-2 h-5 w-5 text-gray-400" />}
+      {label}
+    </h4>
+    <div className="text-gray-600 text-sm leading-relaxed">{children}</div>
+  </div>
+);
+
+// Component for critical observations with different levels (warning, info, success)
+const CriticalObservation = ({ children, level = 'warning' }) => {
+  // Define styles based on the level
+  const styles = {
+    warning: { bg: 'bg-yellow-50', border: 'border-yellow-400', text: 'text-yellow-800', icon: FileWarning, title: 'Analyse Critique / Points de Vigilance' },
+    info: { bg: 'bg-blue-50', border: 'border-blue-400', text: 'text-blue-800', icon: Info, title: 'Analyse / Observations' },
+    success: { bg: 'bg-green-50', border: 'border-green-400', text: 'text-green-800', icon: CheckCircle, title: 'Conclusion / Points Positifs' },
+  };
+  const Icon = styles[level].icon;
+  const title = styles[level].title;
+
+  return (
+    <div className={`mt-5 p-4 border-l-4 ${styles[level].border} ${styles[level].bg} rounded-r-lg`}>
+      <h5 className={`font-semibold ${styles[level].text} mb-2 flex items-center text-base`}>
+        <Icon className="mr-2 h-5 w-5" />
+        {title}
+      </h5>
+      <div className={`${styles[level].text} text-sm space-y-2 leading-relaxed`}>{children}</div>
+    </div>
+  );
+};
+
+// Timeline Component for visualizing debt evolution
+const DebtTimeline = ({ data }) => (
+  <div className="mt-5 space-y-4 relative pl-6 border-l-2 border-indigo-200">
+    {data.map((item, index) => (
+      <div key={index} className="relative pl-4">
+        {/* Timeline marker */}
+        <div className={`absolute -left-[33px] top-1 h-4 w-4 rounded-full border-4 border-white ring-2
+          ${item.type === 'payment' ? 'bg-green-500 ring-green-500' : item.type === 'charge' ? 'bg-red-500 ring-red-500' : 'bg-gray-500 ring-gray-500'}`}>
+        </div>
+        {/* Timeline content */}
+        <div className="p-3 bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow-md transition-shadow">
+          <p className="font-semibold text-sm text-gray-800 mb-1">{item.date}: <span className="font-medium">{item.event}</span></p>
+          <p className={`text-sm ${item.amount > 0 ? 'text-red-600' : 'text-green-600'}`}>
+            Montant: {item.amount.toLocaleString('fr-CH', { style: 'currency', currency: 'CHF' })}
+          </p>
+          <p className={`text-sm font-medium ${item.balance > 0 ? 'text-red-700' : 'text-green-700'}`}>
+            Solde: {item.balance.toLocaleString('fr-CH', { style: 'currency', currency: 'CHF' })} {item.balance > 0 ? '(Dû par Le Signal)' : '(Avance Le Signal)'}
+          </p>
+        </div>
+      </div>
+    ))}
+  </div>
+);
+
+// --- Main Application Component ---
+function App() {
+  return (
+    // Main container with background and padding
+    <div className="bg-gradient-to-br from-gray-50 to-indigo-100 min-h-screen p-4 md:p-8 font-sans antialiased">
+      {/* Header section */}
+      <header className="text-center mb-10">
+        <h1 className="text-3xl md:text-4xl font-bold text-gray-800 tracking-tight">Analyse Critique de la Gestion Financière</h1>
+        <h2 className="text-xl md:text-2xl text-indigo-600 mt-1">PPE Centre Commercial l'Étoile (Perspective BE Capital)</h2>
+        <p className="text-sm text-gray-500 mt-3 max-w-2xl mx-auto">Basée sur la synthèse des points soulevés par D. Jandric et les documents comptables 2023/2024 fournis.</p>
+      </header>
+
+      {/* Tabs container */}
+      <Tabs defaultValue="point1" className="w-full max-w-6xl mx-auto bg-white rounded-xl shadow-lg border border-gray-200/80 p-2 sm:p-4">
+        {/* Tabs list - responsive grid layout */}
+        <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-1 p-1 bg-gray-100 rounded-lg mb-4">
+          {/* Individual tab triggers */}
+          <TabsTrigger value="point1">Pt 1: CVS</TabsTrigger>
+          <TabsTrigger value="point2">Pt 2: Signal %</TabsTrigger>
+          <TabsTrigger value="point3">Pt 3: Signal Dette</TabsTrigger>
+          <TabsTrigger value="point4">Pt 4: Concierge</TabsTrigger>
+          <TabsTrigger value="point5">Pt 5: BE Capital</TabsTrigger>
+          <TabsTrigger value="point6">Pt 6: Sinistres</TabsTrigger>
+          <TabsTrigger value="point7">Pt 7: Comptes</TabsTrigger>
+          <TabsTrigger value="be_capital_exit">Pt 8: Sortie PPE</TabsTrigger>
+        </TabsList>
+
+        {/* --- Tab Content Sections --- */}
+
+        {/* Point 1 Content: Chauffage/Climatisation */}
+        <TabsContent value="point1">
+          <AnalysisCard point="1" title="Répartition Chauffage & Climatisation (Coefficients Spéciaux)" icon={Scale}>
+            <AnalysisDetail label="Demande Initiale" icon={FileText}>
+              Clarification sur la méthode de répartition des frais de Chauffage, Ventilation, Climatisation (CVS) et vérification des coefficients spécifiques adoptés en 2007.
+            </AnalysisDetail>
+            <AnalysisDetail label="Réponse Agence & Vérification" icon={CheckCircle}>
+              La répartition est effectuée conformément au PV de l'AG extraordinaire de septembre 2007, qui a adopté des coefficients techniques (étude GD Climat SA) pour les frais CVS et de climatisation, dérogeant à la répartition standard aux millièmes pour ces postes. Les autres charges communes sont réparties aux millièmes. Ceci est confirmé par le PV 2007 (Art. 22 modifié) et les écritures comptables de 2023.
+              <Table className="mt-3">
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Type de Frais</TableHead>
+                    <TableHead>Méthode de Répartition</TableHead>
+                    <TableHead>Base / Justification</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {chauffageData.map((row) => (
+                    <TableRow key={row.name}>
+                      <TableCell className="font-medium">{row.name}</TableCell>
+                      <TableCell>{row.type}</TableCell>
+                      <TableCell>{row.base}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </AnalysisDetail>
+            <CriticalObservation level="warning">
+              <p><strong>Conformité vs Pertinence Actuelle :</strong> Bien que la méthode soit conforme aux décisions historiques de l'AG, les coefficients techniques reposent sur une étude datant de 2007 (18 ans). L'évolution de l'immeuble (transformation de l'ex-Coop en Hôtel du Rhône par BE Capital, changements d'occupation, rénovations énergétiques potentielles) rend l'actualité de ces coefficients incertaine.</p>
+              <p><strong>Risque d'Inéquité :</strong> Des coefficients obsolètes peuvent entraîner une répartition des charges de chauffage et climatisation qui ne reflète plus la consommation ou l'usage réel de chaque lot, créant un risque d'inéquité entre copropriétaires.</p>
+              <p><strong>Suggestion d'Action :</strong> Il serait prudent de proposer en AG la commande d'une mise à jour de l'étude de répartition GD Climat ou, mieux, d'envisager l'installation de compteurs de chaleur/froid individuels pour une facturation basée sur la consommation réelle.</p>
+              <p><strong>Planification Financière :</strong> Le PV 2007 évoquait un besoin d'assainissement des installations CVS estimé à ~1.95M CHF. Il est crucial de vérifier où en est ce projet, l'état actuel du fonds de rénovation et les plans concrets pour ces travaux potentiellement majeurs. Un manque d'anticipation pourrait peser lourdement sur les copropriétaires, y compris BE Capital.</p>
+            </CriticalObservation>
+          </AnalysisCard>
+        </TabsContent>
+
+        {/* Point 2 Content: Participation Le Signal */}
+        <TabsContent value="point2">
+          <AnalysisCard point="2" title="Participation Immeuble 'Le Signal' (7.27%)" icon={Home}>
+            <AnalysisDetail label="Demande Initiale" icon={FileText}>
+              Justification de l'origine du taux fixe de 7.27% appliqué à la PPE voisine "Le Signal" et des charges concernées par ce partage.
+            </AnalysisDetail>
+            <AnalysisDetail label="Réponse Agence & Vérification" icon={CheckCircle}>
+              Ce taux historique découlerait d'un accord initial basé sur l'utilisation proportionnelle par "Le Signal" de certaines installations et services communs de "L'Étoile" (chauffage, eau, conciergerie, entretien technique...). Le Grand-Livre 2023 montre une application cohérente de ce taux de 7.27% sur de nombreux comptes de charges partagées.
+              <p className="mt-3 font-semibold text-gray-700">Participation Le Signal aux Charges Communes (Exemples 2023) :</p>
+              {/* Bar chart visualizing Signal's participation */}
+              <ResponsiveContainer width="100%" height={250}>
+                 <BarChart data={signalParticipationData} layout="vertical" margin={{ top: 5, right: 30, left: 50, bottom: 5 }}>
+                   <CartesianGrid strokeDasharray="3 3" horizontal={false}/>
+                   <XAxis type="number" fontSize={10} />
+                   <YAxis dataKey="charge" type="category" width={100} fontSize={10} interval={0} />
+                   <Tooltip formatter={(value) => `${value.toLocaleString('fr-CH', { style: 'currency', currency: 'CHF' })}`} contentStyle={{fontSize: '12px', padding: '5px'}}/>
+                   <Legend wrapperStyle={{ fontSize: '11px', paddingTop: '10px' }}/>
+                   <Bar dataKey="participation" fill="#82ca9d" name="Participation Le Signal (CHF)" barSize={15}/>
+                 </BarChart>
+               </ResponsiveContainer>
+                <p className="text-xs text-gray-500 text-center mt-1">Total Participation Le Signal 2023 (calculé) : {totalSignalParticipation2023.toLocaleString('fr-CH', { style: 'currency', currency: 'CHF' })}</p>
+            </AnalysisDetail>
+            <CriticalObservation level="warning">
+              <p><strong>Absence de Document Formel :</strong> L'accord initial fixant le taux de 7.27% n'a pas été fourni et ne semble pas être inscrit dans le règlement de PPE ou le PV 2007. Il est recommandé de demander une trace écrite (convention de servitude, règlement d'exploitation commun, PV antérieur) pour clarifier la base juridique et technique de ce taux.</p>
+              <p><strong>Pertinence du Taux Fixe :</strong> Un taux fixe établi il y a longtemps pourrait ne plus refléter la proportion réelle d'utilisation des services par "Le Signal", surtout si des changements (rénovations, usage) sont intervenus dans l'un ou l'autre immeuble. Une vérification périodique de la pertinence de ce taux serait justifiée.</p>
+              <p><strong>Sécurité Juridique :</strong> Bien que la pratique comptable soit constante, l'absence de formalisation écrite de cet accord inter-PPE représente un léger risque juridique potentiel. Sa formalisation (si ce n'est déjà fait) préviendrait d'éventuels litiges.</p>
+            </CriticalObservation>
+          </AnalysisCard>
+        </TabsContent>
+
+        {/* Point 3 Content: Compte Débiteur Le Signal */}
+         <TabsContent value="point3">
+           <AnalysisCard point="3" title="Compte 'Débiteur Le Signal' & Suivi Paiements" icon={Milestone}>
+             <AnalysisDetail label="Demande Initiale" icon={FileText}>
+               Éclaircissements sur le fonctionnement du compte courant avec la PPE "Le Signal" et la raison du solde débiteur significatif (~55k CHF) en sa défaveur à fin 2023.
+             </AnalysisDetail>
+             <AnalysisDetail label="Réponse Agence & Vérification" icon={CheckCircle}>
+               La PPE Étoile avance les frais communs partagés durant l'année. "Le Signal" verse des acomptes (un acompte de 60'000 CHF a été versé en novembre 2023) et une régularisation annuelle est effectuée. Le solde débiteur de 47'579.40 CHF de fin 2022 a été couvert par l'acompte 2023. Le solde final 2023 de +54'768.60 CHF représente la part des charges 2023 restant due par "Le Signal", à recouvrer en 2024. Le suivi comptable est transparent mais révèle un décalage systématique.
+               <p className="mt-3 font-semibold text-gray-700">Évolution du Solde du Compte Courant "Le Signal" (2023) :</p>
+               {/* Timeline visualization */}
+               <DebtTimeline data={signalDebtTimelineData} />
+             </AnalysisDetail>
+             <CriticalObservation level="warning">
+               <p><strong>Impact sur la Trésorerie de l'Étoile :</strong> Le système actuel implique que la PPE Étoile supporte l'avance de trésorerie pour une partie des charges de "Le Signal" tout au long de l'année. Le solde de ~55k CHF fin 2023 n'est pas négligeable et grève les liquidités de l'Étoile.</p>
+               <p><strong>Absence d'Intérêts Compensatoires :</strong> Il n'est fait mention d'aucun intérêt (moratoire ou compensatoire) facturé à "Le Signal" pour ce crédit permanent, ce qui constitue un avantage financier pour "Le Signal" au détriment de l'Étoile.</p>
+               <p><strong>Optimisation du Recouvrement :</strong> Le versement d'un unique acompte annuel tardif n'est pas optimal. Il serait pertinent de proposer en AG un calendrier de paiement plus régulier (ex: acomptes semestriels ou trimestriels basés sur le budget) pour minimiser le solde débiteur et le risque pour la trésorerie.</p>
+               <p><strong>Formalisation de l'Accord :</strong> Il serait utile de vérifier si ce mode de règlement (avance par l'Étoile, acompte annuel par Le Signal, pas d'intérêts) est formalisé dans un accord écrit entre les deux PPE.</p>
+               <p><strong>Point de Vigilance Stratégique :</strong> Bien que la créance semble régulièrement apurée, ce décalage structurel représente un point de vigilance (gestion de trésorerie, discipline de paiement) qui mérite une discussion en AG pour potentiellement renégocier les modalités.</p>
+             </CriticalObservation>
+           </AnalysisCard>
+         </TabsContent>
+
+        {/* Point 4 Content: Conciergerie */}
+        <TabsContent value="point4">
+          <AnalysisCard point="4" title="Frais de Conciergerie & Nettoyage" icon={Wrench}>
+            <AnalysisDetail label="Demande Initiale" icon={FileText}>
+              Détails sur le personnel employé pour la conciergerie et le nettoyage, le coût total en 2023 (salaires, charges) et la clé de répartition avec "Le Signal".
+            </AnalysisDetail>
+            <AnalysisDetail label="Réponse Agence & Vérification" icon={CheckCircle}>
+              L'équipe comprend un concierge titulaire (M. P.-A. Claivaz) et des aides (Mme F. Métrailler, M. R. Métrailler, Mme A. Fejzic mentionnée en 2023). Le coût annuel total (salaires bruts + charges sociales + LAA + outillage partagé) est estimé à environ 248'000 CHF pour 2023. La PPE "Le Signal" participe à hauteur de 7.27% sur les postes partagés (soit ~18'345 CHF en 2023). Le Grand-Livre confirme les versements mensuels et l'application de la participation de "Le Signal". L'agence justifie le coût par la taille et la complexité du centre commercial.
+              <p className="mt-3 font-semibold text-gray-700">Répartition Estimée des Coûts de Conciergerie (2023) :</p>
+              {/* Table summarizing concierge costs */}
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Poste de Dépense</TableHead>
+                    <TableHead className="text-right">Coût Total Annuel (Est.)</TableHead>
+                    <TableHead className="text-right">Part Le Signal (7.27%)</TableHead>
+                    <TableHead className="text-right">Part PPE Étoile (92.73%)</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {conciergeCostsData.map((item) => (
+                    <TableRow key={item.item}>
+                      <TableCell>{item.item}</TableCell>
+                      <TableCell className="text-right">{item.cost.toLocaleString('fr-CH', { style: 'currency', currency: 'CHF' })}</TableCell>
+                      <TableCell className="text-right">{item.signalPart.toLocaleString('fr-CH', { style: 'currency', currency: 'CHF' })}</TableCell>
+                      <TableCell className="text-right">{item.etoilePart.toLocaleString('fr-CH', { style: 'currency', currency: 'CHF' })}</TableCell>
+                    </TableRow>
+                  ))}
+                   <TableRow className="font-semibold bg-gray-100">
+                      <TableCell>Total (estimé)</TableCell>
+                      <TableCell className="text-right">{totalConciergeCost.toLocaleString('fr-CH', { style: 'currency', currency: 'CHF' })}</TableCell>
+                      <TableCell className="text-right">{totalConciergeSignal.toLocaleString('fr-CH', { style: 'currency', currency: 'CHF' })}</TableCell>
+                      <TableCell className="text-right">{totalConciergeEtoile.toLocaleString('fr-CH', { style: 'currency', currency: 'CHF' })}</TableCell>
+                    </TableRow>
+                </TableBody>
+              </Table>
+            </AnalysisDetail>
+            <CriticalObservation level="info">
+              <p><strong>Coût Significatif :</strong> Près de 250'000 CHF par an représentent un poste de dépense majeur. Bien que potentiellement justifié par l'ampleur des tâches dans un centre commercial, une évaluation périodique du rapport coût/efficacité est saine.</p>
+              <p><strong>Alternative d'Externalisation :</strong> Une analyse comparative (coûts, qualité de service, flexibilité) entre le personnel interne actuel et une externalisation à une société de facility management pourrait être envisagée pour identifier d'éventuelles économies, en tenant compte de tous les aspects (y compris le logement de fonction).</p>
+              <p><strong>Logement de Fonction :</strong> La valeur de l'avantage en nature (logement fourni gratuitement) n'est pas explicitement chiffrée dans les coûts (évalué à 0 CHF dans le GL). Il serait utile de confirmer que cet avantage est bien inclus dans la rémunération globale et d'en estimer la valeur locative pour une vision complète du coût réel.</p>
+              <p><strong>Transparence et Suivi :</strong> Demander un rapport d'activité périodique du service de conciergerie (tâches, heures, etc.) pourrait améliorer la transparence pour les copropriétaires et aider à légitimer le budget ou identifier des pistes d'optimisation.</p>
+              <p><strong>Contribution "Le Signal" :</strong> La participation de "Le Signal" est un point positif qui allège la charge des copropriétaires de l'Étoile.</p>
+            </CriticalObservation>
+          </AnalysisCard>
+        </TabsContent>
+
+        {/* Point 5 Content: BE Capital Charges */}
+        <TabsContent value="point5">
+           <AnalysisCard point="5" title="Décompte Charges BE Capital (Ex-Coop / Hôtel)" icon={TrendingUp}>
+             <AnalysisDetail label="Demande Initiale" icon={FileText}>
+               Compréhension du décompte de charges détaillé pour le lot 74-135 (140‰), propriété de BE Capital SA depuis le 8 février 2024, et explication du solde final.
+             </AnalysisDetail>
+             <AnalysisDetail label="Réponse Agence & Vérification" icon={CheckCircle}>
+               Le décompte pour la période 08.02.2024 - 31.12.2024 a été fourni. Les charges sont calculées au prorata des 140‰ pour les parties communes (ajusté pour la période de propriété) et incluent des frais spécifiques pour le chauffage (selon coefficients CVS) et l'eau/épuration (basé sur compteur individuel). Le solde final est créditeur de 30'384.90 CHF en faveur de BE Capital, expliqué par le fait que les avances versées (par BE Capital et reprises du vendeur) ont excédé les charges réelles sur la période. Les calculs semblent conformes aux règles établies.
+               <p className="mt-3 font-semibold text-gray-700">Décompte BE Capital (08.02.2024 - 31.12.2024) :</p>
+               {/* Table showing BE Capital's charges */}
+               <Table>
+                 <TableHeader>
+                   <TableRow>
+                     <TableHead>Poste</TableHead>
+                     <TableHead className="text-right">Montant (CHF)</TableHead>
+                   </TableRow>
+                 </TableHeader>
+                 <TableBody>
+                   {beCapitalChargesData.map((item) => (
+                     <TableRow key={item.charge} className={item.charge.includes('Total') || item.charge.includes('Solde') ? 'font-semibold' : ''}>
+                       <TableCell>{item.charge}</TableCell>
+                       <TableCell className={`text-right ${item.amount < 0 ? 'text-green-600' : item.amount > 0 && !item.charge.includes('Total') ? 'text-gray-800' : 'text-gray-800'}`}>
+                         {/* Display absolute value, handle negative sign via color */}
+                         {Math.abs(item.amount).toLocaleString('fr-CH', { style: 'currency', currency: 'CHF' })}
+                         {item.charge.includes('Solde') && item.amount < 0 && " (Trop payé)"}
+                       </TableCell>
+                     </TableRow>
+                   ))}
+                 </TableBody>
+               </Table>
+               <p className="text-xs text-gray-500 mt-1 text-right">* Avances incluent versements + part reprise du vendeur.</p>
+               {/* Highlight for high water consumption */}
+               <div className="mt-3 p-3 bg-orange-50 border border-orange-200 rounded-md flex items-start">
+                 <AlertCircle className="h-5 w-5 text-orange-500 mr-2 mt-0.5 flex-shrink-0" />
+                 <p className="text-sm text-orange-700">
+                   <strong>Consommation d'eau très élevée :</strong> 10'236 m³ sur environ 11 mois (~32% du total PPE). Bien que facturée individuellement, cela souligne une utilisation intensive des installations communes (conduites, etc.).
+                 </p>
+               </div>
+             </AnalysisDetail>
+             <CriticalObservation level="info">
+               <p><strong>Conformité des Calculs :</strong> La méthode de répartition (millièmes + spécifiques) est appliquée correctement. L'individualisation des consommations d'eau est essentielle et protège les autres copropriétaires.</p>
+               <p><strong>Solde Créditeur Expliqué :</strong> Le solde en faveur de BE Capital est logiquement dû au mécanisme de reprise des provisions lors de l'achat. Une communication claire en AG est utile pour éviter toute confusion.</p>
+               <p><strong>Ajustement des Acomptes :</strong> Il est nécessaire d'ajuster les acomptes demandés à BE Capital pour 2025 afin qu'ils correspondent mieux aux charges réelles estimées et d'éviter des soldes importants en fin d'exercice.</p>
+               <p><strong>Vérification Exhaustivité Charges Spécifiques :</strong> Il faut s'assurer que TOUTES les charges spécifiques à ce grand lot (notamment la climatisation/ventilation de l'hôtel/commerce, si applicable et non incluse dans le poste chauffage CVS) sont bien imputées via les coefficients dédiés ou facturées séparément, et non diluées dans les charges communes générales.</p>
+               <p><strong>Suivi Consommation d'Eau :</strong> Bien que facturée, la très forte consommation d'eau justifie un suivi et potentiellement une discussion sur l'impact à long terme sur les infrastructures communes.</p>
+               <p><strong>Communication Stratégique :</strong> Il est positif de pouvoir communiquer aux autres copropriétaires que l'arrivée de ce grand consommateur n'augmente pas leurs charges directes grâce à l'individualisation des coûts spécifiques.</p>
+             </CriticalObservation>
+           </AnalysisCard>
+        </TabsContent>
+
+        {/* Point 6 Content: Sinistres */}
+        <TabsContent value="point6">
+          <AnalysisCard point="6" title="Gestion des Sinistres (Franchises Assurances)" icon={ShieldAlert}>
+            <AnalysisDetail label="Demande Initiale" icon={FileText}>
+              Précisions sur la gestion comptable des sinistres couverts par l'assurance de l'immeuble, spécifiquement sur la prise en charge de la franchise lors d'un bris de glace à la pharmacie en 2023.
+            </AnalysisDetail>
+            <AnalysisDetail label="Réponse Agence & Vérification" icon={CheckCircle}>
+              Pour le bris de glace de la pharmacie (Pharmasoft), l'assurance Allianz a indemnisé 1'221.65 CHF sur une facture de 1'421.65 CHF. La franchise de 200 CHF a été imputée aux charges communes de la PPE, sans refacturation au propriétaire du lot. Le Grand-Livre 2023 confirme cette pratique pour ce sinistre et un autre bris de glace (Scex 2, franchise 200 CHF également). L'agence justifie cela par une "tradition" et le caractère commun de l'assurance bris de glace.
+            </AnalysisDetail>
+            <CriticalObservation level="warning">
+              <p><strong>Question d'Équité Fondamentale :</strong> La pratique consistant à faire supporter par l'ensemble de la PPE les franchises pour des dommages affectant exclusivement des parties privatives (vitrine de pharmacie, vitrine Scex 2) est discutable sur le plan de l'équité. Chaque copropriétaire pourrait être tenu pour responsable des dommages survenant sur son lot.</p>
+              <p><strong>Manque de Règle Claire :</strong> Se référer à une "tradition" est insuffisant. Le règlement de PPE ou une décision formelle de l'AG devrait définir clairement la politique de répartition des franchises. Dans de nombreuses PPE, la franchise pour un sinistre privatif est à la charge du copropriétaire concerné.</p>
+              <p><strong>Suggestion de Résolution :</strong> Il est légitime de proposer en AG une résolution visant à modifier cette pratique : "Pour tout sinistre concernant exclusivement un lot privatif, la franchise d'assurance sera supportée par le copropriétaire de ce lot." Cela responsabilise et assure une répartition plus juste des coûts.</p>
+              <p><strong>Impact Financier vs Principe :</strong> Même si les montants individuels (200 CHF par franchise) sont modestes, l'accumulation sur plusieurs sinistres peut devenir significative. Surtout, c'est une question de principe de bonne gouvernance et d'équité.</p>
+              <p><strong>Gestion à Améliorer :</strong> La réponse de l'agence se limite à décrire la pratique sans explorer les alternatives ou la base réglementaire. C'est un aspect de la gestion qui peut être amélioré par une décision claire de l'AG.</p>
+            </CriticalObservation>
+          </AnalysisCard>
+        </TabsContent>
+
+        {/* Point 7 Content: Vérification Comptes */}
+        <TabsContent value="point7">
+           <AnalysisCard point="7" title="Vérification Détaillée des Comptes 2023" icon={FileText}>
+             <AnalysisDetail label="Demande Initiale" icon={FileText}>
+               Contrôle approfondi du Grand-Livre 2023 pour examiner certains postes de charges (contrats de maintenance, réparations, régularisations de fin d'année) et vérifier la cohérence globale.
+             </AnalysisDetail>
+             <AnalysisDetail label="Réponse Agence & Vérification" icon={CheckCircle}>
+               Le Grand-Livre complet 2023 a été fourni. L'examen confirme l'application de bonnes pratiques comptables par l'agence :
+               <ul className="list-disc pl-5 mt-2 space-y-1">
+                 <li><strong>Ventilation Temporelle :</strong> Utilisation correcte des comptes de régularisation (charges payées d'avance, frais à payer) pour rattacher les charges (contrats de maintenance Clime, assurances, factures tardives) à l'exercice comptable approprié.</li>
+                 <li><strong>Gestion du Stock :</strong> Inventaire et valorisation du stock final de mazout (26'200 L pour 24'886.60 CHF) pour ne charger l'exercice 2023 que de la consommation réelle.</li>
+                 <li><strong>Traçabilité :</strong> Dépenses d'entretien courant (Clime, Héritier Jardin Forêt, etc.) et réparations diverses (Logi-Therm, Pitteloud pour dégât d'eau) sont tracées avec fournisseur et date.</li>
+                 <li><strong>Cohérence Globale :</strong> Les soldes des comptes de charges correspondent aux chiffres présentés dans les décomptes. Aucune dépense injustifiée ou incohérence majeure n'a été relevée lors de l'examen des documents fournis.</li>
+               </ul>
+             </AnalysisDetail>
+             <CriticalObservation level="success">
+               <p><strong>Rigueur Comptable Confirmée :</strong> La vérification détaillée n'a pas révélé d'erreurs ou de malversations. Les principes comptables semblent correctement appliqués, offrant une image fidèle des charges annuelles.</p>
+               <p><strong>Axes Stratégiques d'Amélioration :</strong> Au-delà de la conformité comptable, des pistes d'optimisation existent :</p>
+               <ul className="list-disc pl-5 space-y-1">
+                 <li><strong>Négociation des Contrats :</strong> Mettre en concurrence ou renégocier périodiquement les contrats de maintenance récurrents (ascenseurs Clime/Schindler, climatisation GD Climat, système incendie Siemens, etc.) dont les montants annuels sont significatifs.</li>
+                 <li><strong>Vision à Long Terme (Investissements) :</strong> Les coûts élevés de combustible (~465k CHF brut en 2023) et de maintenance/énergie pour la climatisation (~109k CHF brut) signalent le vieillissement et/ou l'inefficacité potentielle des installations. Une discussion stratégique en AG sur la modernisation énergétique (isolation, chaudière, renouvelables) versus le maintien de charges d'exploitation élevées est pertinente.</li>
+                 <li><strong>Transparence et Communication :</strong> Compte tenu de la complexité (coefficients CVS, accord Le Signal, etc.), préparer des synthèses pédagogiques pour l'AG améliorerait la compréhension collective et la confiance dans la gestion.</li>
+               </ul>
+               <p><strong>Conclusion :</strong> La gestion comptable est saine, mais des opportunités d'optimisation contractuelle, de planification stratégique des investissements et d'amélioration de la communication existent pour renforcer la performance globale de la gestion de la PPE.</p>
+             </CriticalObservation>
+           </AnalysisCard>
+         </TabsContent>
+
+        {/* BE Capital Exit Strategy Content */}
+        <TabsContent value="be_capital_exit">
+          <Card className="mb-8 shadow-md bg-indigo-50 border border-indigo-200">
+            <CardHeader>
+              <CardTitle className="flex items-center text-indigo-800">
+                <LogOut className="mr-2.5 h-5 w-5" />
+                Perspective BE Capital : Analyse et Options de Sortie de la PPE
+              </CardTitle>
+              <CardDescription className="text-indigo-700">
+                Évaluation de la position de BE Capital au sein de la PPE l'Étoile et analyse des possibilités (limitées) de désengagement selon le droit suisse.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-5 text-sm text-gray-800">
+              {/* Section: Current Situation */}
+              <div>
+                <h4 className="font-semibold text-gray-900 mb-2 text-base">Situation Actuelle de BE Capital :</h4>
+                <ul className="list-disc pl-5 space-y-1.5 text-gray-700">
+                  <li><strong>Acteur Majeur :</strong> Détention de 140/1000èmes (anciennement Coop, actuellement Hôtel du Rhône/commerce), conférant un poids décisionnel notable mais non majoritaire en AG.</li>
+                  <li><strong>Charges Maîtrisées? :</strong> Bien que calculées selon les règles (Point 5), les charges subissent l'impact potentiel de coefficients CVS obsolètes (Point 1) et de pratiques de gestion perfectibles (Points 3, 6, 7).</li>
+                  <li><strong>Usage Intensif :</strong> La forte consommation d'eau (~32% du total) est correctement facturée mais sollicite davantage les infrastructures communes.</li>
+                  <li><strong>Intérêts Potentiellement Divergents :</strong> Les priorités d'un propriétaire de locaux commerciaux/hôteliers (flexibilité, coûts d'exploitation) peuvent différer de celles des propriétaires de logements ou bureaux (confort, valorisation patrimoniale).</li>
+                </ul>
+              </div>
+              {/* Section: Critical Analysis */}
+              <div>
+                <h4 className="font-semibold text-gray-900 mb-2 text-base">Analyse Critique (Vue BE Capital) :</h4>
+                <ul className="list-disc pl-5 space-y-1.5 text-gray-700">
+                  <li><strong>Contraintes Structurelles :</strong> La PPE impose des décisions collectives (majorités qualifiées, parfois unanimité), ce qui peut entraver des adaptations ou investissements spécifiques au lot de BE Capital ou imposer des dépenses communes non prioritaires pour son activité.</li>
+                  <li><strong>Optimisation des Coûts :</strong> Certains postes de charges partagées (conciergerie, entretien technique, franchises non refacturées) pourraient être perçus comme non optimisés ou inéquitablement répartis du point de vue de BE Capital.</li>
+                  <li><strong>Risques Financiers Partagés :</strong> Dépendance vis-à-vis de la qualité de gestion de l'agence et des décisions de l'AG pour la maîtrise globale des charges. Exposition au risque financier lié aux gros travaux futurs (état du fonds de réserve, planification).</li>
+                  <li><strong>Complexité Administrative :</strong> La gestion via une PPE, complexifiée par un accord inter-PPE (Le Signal) et des clés de répartition spécifiques, peut générer une charge administrative et un manque de transparence perçu.</li>
+                </ul>
+              </div>
+              {/* Section: Exit Options (Legal Framework) */}
+               <div className="p-4 border border-red-300 bg-red-50 rounded-lg shadow-inner">
+                 <h4 className="font-semibold text-red-800 mb-2 flex items-center text-base"><ShieldAlert className="h-5 w-5 mr-2 text-red-600"/>Options de Sortie de la PPE (Cadre Légal Suisse) :</h4>
+                 <p className="text-red-700 mb-3">Il est crucial de comprendre que sortir d'une PPE en Suisse est <strong>juridiquement très difficile</strong> et les options sont extrêmement limitées. La PPE constitue une unité foncière.</p>
+                 <ul className="list-disc pl-5 space-y-2 text-red-700">
+                   <li>
+                     <strong>1. Vente de l'Unité (Option Principale et Réaliste) :</strong>
+                     <p className="text-red-600 text-xs mt-0.5">La méthode standard et la plus pragmatique pour se désengager est de vendre la part d'étage (les 140‰) à un tiers. BE Capital transfère ainsi l'ensemble de ses droits et obligations au nouvel acquéreur.</p>
+                   </li>
+                   <li>
+                     <strong>2. Modification Structurelle (Très Complexe et Improbable) :</strong>
+                     <ul className="list-circle pl-5 mt-1 space-y-1">
+                       <li><strong>Division/Scission de la PPE :</strong> Créer des PPE distinctes (ex: commercial vs résidentiel) exigerait quasi certainement l'accord <strong>unanime</strong> de tous les copropriétaires, des modifications majeures des actes constitutifs, du règlement et du Registre Foncier. Procédure très lourde et rarement réalisable sans consensus absolu.</li>
+                       <li><strong>Rachat par les Autres Copropriétaires :</strong> Négocier un rachat de la part de BE Capital par les autres membres de la PPE. Improbable compte tenu de la valeur et de la taille du lot.</li>
+                     </ul>
+                   </li>
+                    <li>
+                     <strong>3. Dissolution Judiciaire de la PPE (Exceptionnel et Aléatoire) :</strong>
+                     <p className="text-red-600 text-xs mt-0.5">Invoquer l'art. 651 CC (par analogie) pour demander la dissolution en justice n'est possible que pour de <strong>justes motifs</strong> rendant la communauté intolérable ou l'utilisation du bien impossible (ex: destruction partielle majeure, dissensions graves et insolubles paralysant totalement le fonctionnement). Les désaccords de gestion, même importants, ne constituent généralement pas un juste motif suffisant. Procédure longue, coûteuse et à l'issue très incertaine.</p>
+                   </li>
+                   <li>
+                     <strong>4. Vérification du Règlement Spécifique :</strong>
+                      <p className="text-red-600 text-xs mt-0.5">Consulter le règlement d'administration et d'utilisation de la PPE l'Étoile pour identifier d'éventuelles clauses (extrêmement rares) qui prévoiraient des modalités spécifiques de modification structurelle ou de sortie.</p>
+                   </li>
+                 </ul>
+                 <p className="mt-4 font-semibold text-red-800">Conclusion sur la Sortie : Hormis la vente du lot, les autres options sont théoriques et très difficiles à mettre en œuvre dans la pratique.</p>
+               </div>
+               {/* Section: Alternative Strategy */}
+               <div>
+                 <h4 className="font-semibold text-gray-900 mb-2 text-base">Stratégie Alternative : Influence et Optimisation Interne</h4>
+                 <p className="text-gray-700">Face à la difficulté d'une sortie structurelle, une stratégie plus pragmatique pour BE Capital consiste à utiliser son poids de 140‰ pour influencer positivement la gestion de la PPE :</p>
+                 <ul className="list-disc pl-5 space-y-1.5 text-gray-700">
+                      <li><strong>Participer Activement aux AG :</strong> Proposer et voter des résolutions visant à moderniser la gestion (ex: mise à jour des coefficients CVS, adoption d'une politique claire sur les franchises, renégociation des contrats de maintenance, amélioration du calendrier de paiement de Le Signal).</li>
+                      <li><strong>Proposer des Optimisations :</strong> Suggérer des études pour des optimisations (ex: stratégie énergétique, analyse comparative de la conciergerie).</li>
+                      <li><strong>Mandater des Experts :</strong> Si nécessaire, proposer de mandater des experts indépendants pour valider ou challenger certains points techniques (coefficients CVS, état réel des installations).</li>
+                      <li><strong>Promouvoir la Transparence :</strong> Exiger et encourager une communication transparente et proactive de la part de l'administration envers tous les copropriétaires.</li>
+                      <li><strong>Collaborer (si possible) :</strong> Tenter de trouver des terrains d'entente avec d'autres copropriétaires ayant des intérêts similaires sur certains sujets.</li>
+                 </ul>
+               </div>
+            </CardContent>
+            <CardFooter>
+              Avis fourni à titre informatif et non juridique. Pour toute décision stratégique concernant la sortie d'une PPE, la consultation d'un avocat spécialisé en droit immobilier suisse est indispensable.
+            </CardFooter>
+          </Card>
+        </TabsContent>
+
+      </Tabs>
+    </div>
+  );
+}
+
+// Export the main component for rendering
+export default App;
