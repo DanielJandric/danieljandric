@@ -1,0 +1,547 @@
+import React, { useState, useEffect, createContext, useContext, useRef } from 'react';
+// Importer des icônes (exemple avec lucide-react, s'assurer qu'elles existent)
+// Si non disponibles, utiliser des SVG inline ou Font Awesome via <link> dans l'index.html (non visible ici)
+import { Sun, Moon, Brain, Cog, GraduationCap, Briefcase, Phone, Linkedin, Mail, MapPin, ChevronsDown } from 'lucide-react';
+
+// --- Theme Context ---
+// Contexte pour gérer le thème (clair/sombre)
+const ThemeContext = createContext();
+
+// Fournisseur de thème
+const ThemeProvider = ({ children }) => {
+  // État pour le thème, 'light' par défaut
+  const [theme, setTheme] = useState('light');
+
+  // Effet pour appliquer la classe de thème au body
+  useEffect(() => {
+    const root = window.document.documentElement;
+    root.classList.remove(theme === 'light' ? 'dark' : 'light');
+    root.classList.add(theme);
+    // Optionnel: Sauvegarder le thème dans localStorage
+    // localStorage.setItem('theme', theme);
+  }, [theme]);
+
+  // Fonction pour basculer le thème
+  const toggleTheme = () => {
+    setTheme((prevTheme) => (prevTheme === 'light' ? 'dark' : 'light'));
+  };
+
+  return (
+    <ThemeContext.Provider value={{ theme, toggleTheme }}>
+      {children}
+    </ThemeContext.Provider>
+  );
+};
+
+// Hook personnalisé pour utiliser le contexte de thème
+const useTheme = () => useContext(ThemeContext);
+
+// --- Solarized Colors (for reference and conditional styling) ---
+const solarized = {
+  light: {
+    base03: '#002b36', base02: '#073642', base01: '#586e75', base00: '#657b83',
+    base0:  '#839496', base1:  '#93a1a1', base2:  '#eee8d5', base3:  '#fdf6e4',
+    yellow: '#b58900', orange: '#cb4b16', red:    '#dc322f', magenta:'#d33682',
+    violet: '#6c71c4', blue:   '#268bd2', cyan:   '#2aa198', green:  '#859900'
+  },
+  dark: {
+    base03: '#fdf6e4', base02: '#eee8d5', base01: '#93a1a1', base00: '#839496',
+    base0:  '#657b83', base1:  '#586e75', base2:  '#073642', base3:  '#002b36',
+    // Accents can remain the same or be adjusted slightly if needed
+    yellow: '#b58900', orange: '#cb4b16', red:    '#dc322f', magenta:'#d33682',
+    violet: '#6c71c4', blue:   '#268bd2', cyan:   '#2aa198', green:  '#859900'
+  }
+};
+
+// --- Scroll Animation Hook ---
+// Hook personnalisé pour gérer l'animation au défilement
+const useScrollAnimation = (options = { threshold: 0.1, triggerOnce: true }) => {
+  const [isVisible, setIsVisible] = useState(false);
+  const elementRef = useRef(null);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting) {
+        setIsVisible(true);
+        if (options.triggerOnce && elementRef.current) {
+          observer.unobserve(elementRef.current);
+        }
+      } else {
+        // Optionnel: Cacher à nouveau si triggerOnce est false
+        // if (!options.triggerOnce) {
+        //   setIsVisible(false);
+        // }
+      }
+    }, options);
+
+    const currentElement = elementRef.current;
+    if (currentElement) {
+      observer.observe(currentElement);
+    }
+
+    // Nettoyage à la désinstallation du composant
+    return () => {
+      if (currentElement) {
+        observer.unobserve(currentElement);
+      }
+    };
+  }, [options.triggerOnce, options.threshold, options]); // Ajout des dépendances
+
+  // Classes CSS pour l'animation
+  const animationClasses = `transition-all duration-700 ease-out ${
+    isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-5'
+  }`;
+
+  return [elementRef, animationClasses];
+};
+
+
+// --- Components ---
+
+// Composant Barre de Navigation
+const Navbar = () => {
+  const { theme, toggleTheme } = useTheme();
+  const navBg = theme === 'light' ? 'bg-[#eee8d5]' : 'bg-[#073642]'; // Base2 light, Base02 dark
+  const textColor = theme === 'light' ? 'text-[#657b83]' : 'text-[#93a1a1]'; // Base00 light, Base01 dark
+  const hoverColor = theme === 'light' ? 'hover:text-[#268bd2]' : 'hover:text-[#2aa198]'; // Blue light, Cyan dark
+  const brandColor = theme === 'light' ? 'text-[#073642]' : 'text-[#eee8d5]'; // Base02 light, Base2 dark
+
+  const links = [
+    { href: "#about", label: "About" },
+    { href: "#skills", label: "Skills" },
+    { href: "#tech", label: "Tech" },
+    { href: "#education", label: "Education" },
+    { href: "#experience", label: "Experience" },
+    { href: "#timeline", label: "Timeline" },
+    { href: "#contact", label: "Contact" },
+  ];
+
+  return (
+    <nav className={`${navBg} shadow-sm sticky top-0 z-50 transition-colors duration-300`}>
+      <div className="container mx-auto px-6 py-3 flex justify-between items-center">
+        <div className={`text-xl font-semibold ${brandColor}`}>Daniel Jandric</div>
+        <div className="flex items-center space-x-1 md:space-x-3">
+          {/* Liens de navigation pour écrans larges */}
+          <div className="hidden md:flex items-center space-x-1">
+             {links.map(link => (
+                <a key={link.href} href={link.href} className={`${textColor} ${hoverColor} px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200`}>{link.label}</a>
+             ))}
+          </div>
+           {/* Menu déroulant pour petits écrans (simplifié ici) */}
+           <div className="md:hidden">
+               {/* Ajouter un bouton de menu ici si nécessaire */}
+           </div>
+          {/* Bouton de changement de thème */}
+          <button
+            onClick={toggleTheme}
+            className={`${textColor} ${hoverColor} p-2 rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#268bd2]`}
+            aria-label="Toggle theme"
+          >
+            {theme === 'light' ? <Moon size={20} /> : <Sun size={20} />}
+          </button>
+        </div>
+      </div>
+    </nav>
+  );
+};
+
+// Composant Section Héros
+const Hero = () => {
+    const { theme } = useTheme();
+    const gradientFrom = theme === 'light' ? 'from-[#2aa198]' : 'from-[#073642]'; // Cyan light, Base02 dark
+    const gradientTo = theme === 'light' ? 'to-[#268bd2]' : 'to-[#002b36]'; // Blue light, Base03 dark
+    const textPrimary = theme === 'light' ? 'text-white' : 'text-[#eee8d5]'; // White light, Base2 dark
+    const textSecondary = theme === 'light' ? 'text-[#eee8d5]' : 'text-[#93a1a1]'; // Base2 light, Base01 dark
+    const borderClass = theme === 'light' ? 'border-[#fdf6e4]/70' : 'border-[#586e75]/70'; // Base3 light, Base1 dark
+
+    const [refImg, animationImg] = useScrollAnimation();
+    const [refH1, animationH1] = useScrollAnimation({ threshold: 0.1, triggerOnce: true });
+    const [refP1, animationP1] = useScrollAnimation({ threshold: 0.1, triggerOnce: true });
+    const [refP2, animationP2] = useScrollAnimation({ threshold: 0.1, triggerOnce: true });
+
+
+  return (
+    <header className={`relative bg-gradient-to-r ${gradientFrom} ${gradientTo} text-[#fdf6e4] py-20 md:py-32 overflow-hidden transition-colors duration-300`}>
+      <div className="absolute inset-0 z-0">
+           <img src="https://raw.githubusercontent.com/DanielJandric/danieljandric/main/MM.jpg"
+               alt="Background portrait of Daniel Jandric"
+               className="w-full h-full object-cover opacity-10 md:opacity-15"
+               onError={(e) => e.target.style.display='none'}
+               />
+           <div className={`absolute inset-0 bg-gradient-to-r ${gradientFrom}/30 ${gradientTo}/40`}></div>
+      </div>
+      <div className="container mx-auto px-6 text-center relative z-10">
+           <img ref={refImg} src="https://raw.githubusercontent.com/DanielJandric/danieljandric/main/MM.jpg"
+               alt="Profile photo of Daniel Jandric"
+               className={`w-24 h-24 md:w-32 md:h-32 rounded-full mx-auto mb-6 border-4 ${borderClass} shadow-lg object-cover ${animationImg}`}
+               onError={(e) => { e.target.onerror = null; e.target.src='https://placehold.co/128x128/eee8d5/586e75?text=DJ'; }}/>
+          <h1 ref={refH1} className={`text-4xl md:text-5xl font-bold mb-3 ${textPrimary} ${animationH1}`} style={{transitionDelay: '100ms'}}>Daniel Jandric</h1>
+          <p ref={refP1} className={`text-xl md:text-2xl font-light ${textSecondary} ${animationP1}`} style={{transitionDelay: '200ms'}}>Executive Leader | COO / CFO</p>
+          <p ref={refP2} className={`mt-4 text-lg max-w-3xl mx-auto ${textSecondary} ${animationP2}`} style={{transitionDelay: '300ms'}}>Transformational leader with proven expertise in finance, operations, and AI integration, adaptable across all industries.</p>
+      </div>
+    </header>
+  );
+};
+
+// Composant Section "About Me"
+const About = () => {
+    const { theme } = useTheme();
+    const bgColor = theme === 'light' ? 'bg-[#eee8d5]' : 'bg-[#073642]'; // Base2 light, Base02 dark
+    const headingColor = theme === 'light' ? 'text-[#073642]' : 'text-[#eee8d5]'; // Base02 light, Base2 dark
+    const textColor = theme === 'light' ? 'text-[#586e75]' : 'text-[#93a1a1]'; // Base01 light, Base01 dark
+
+    const [refHeading, animationHeading] = useScrollAnimation();
+    const [refContent, animationContent] = useScrollAnimation({ threshold: 0.1, triggerOnce: true });
+
+    return (
+        <section id="about" className={`py-16 md:py-24 ${bgColor} transition-colors duration-300`}>
+            <div className="container mx-auto px-6">
+                <h2 ref={refHeading} className={`text-3xl font-semibold text-center ${headingColor} mb-12 ${animationHeading}`}>About Me</h2>
+                <div ref={refContent} className={`max-w-4xl mx-auto text-lg ${textColor} leading-relaxed ${animationContent}`} style={{ transitionDelay: '100ms' }}>
+                    <p className="mb-6 text-center">
+                        With over 15 years as a Senior Executive (CFO/COO) in diverse settings like listed companies and private equity, I excel in operational transformation, corporate finance, and strategic management. My track record includes executing high-value transactions (> CHF 1.3B) and driving operational excellence.
+                    </p>
+                    <div className="md:flex md:space-x-12 text-center md:text-left">
+                        <div className="md:w-1/2 mb-6 md:mb-0">
+                            <h3 className={`text-xl font-semibold ${headingColor} mb-3`}>Professional Focus</h3>
+                            <p className="mb-4">
+                                I am a strong advocate for leveraging technology, particularly Artificial Intelligence (including prompt engineering and agent coding), to enhance strategic decision-making and operational effectiveness. My industry-agnostic approach allows me to bring fresh perspectives and tailored solutions to various business challenges, always aiming for clarity, efficiency, and measurable results.
+                            </p>
+                        </div>
+                        <div className="md:w-1/2">
+                             <h3 className={`text-xl font-semibold ${headingColor} mb-3`}>Personal Values & Interests</h3>
+                             <p className="mb-4">
+                                Beyond my professional roles, I am a dedicated family man, committed to providing a multicultural and enriching education for my two children. Maintaining a balanced life is key, which includes pursuing sports like running and golf. This personal foundation informs my leadership style, blending analytical rigor with interpersonal awareness and a focus on sustainable growth.
+                             </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    );
+};
+
+// Composant Carte de Compétence
+const SkillCard = ({ title, children, delay = 0 }) => {
+    const { theme } = useTheme();
+    const cardBg = theme === 'light' ? 'bg-[#eee8d5]' : 'bg-[#073642]'; // Base2 light, Base02 dark
+    const headingColor = theme === 'light' ? 'text-[#268bd2]' : 'text-[#2aa198]'; // Blue light, Cyan dark
+    const textColor = theme === 'light' ? 'text-[#657b83]' : 'text-[#93a1a1]'; // Base00 light, Base01 dark
+    const borderColor = theme === 'light' ? 'border-[#93a1a1]/30' : 'border-[#586e75]/30'; // Base1 light, Base1 dark
+
+    const [ref, animationClasses] = useScrollAnimation({ threshold: 0.1, triggerOnce: true });
+
+    return (
+        <div ref={ref} className={`${cardBg} p-6 rounded-lg shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col h-full border ${borderColor} ${animationClasses}`} style={{ transitionDelay: `${delay}ms` }}>
+            <h3 className={`text-xl font-semibold ${headingColor} mb-3`}>{title}</h3>
+            <p className={`${textColor} flex-grow`}>{children}</p>
+        </div>
+    );
+};
+
+
+// Composant Section Compétences
+const Skills = () => {
+    const { theme } = useTheme();
+    const bgColor = theme === 'light' ? 'bg-[#fdf6e4]' : 'bg-[#002b36]'; // Base3 light, Base03 dark
+    const headingColor = theme === 'light' ? 'text-[#073642]' : 'text-[#eee8d5]'; // Base02 light, Base2 dark
+
+    const [refHeading, animationHeading] = useScrollAnimation();
+
+    const skillsData = [
+        { title: "Financial Leadership", description: "Mastery of complex financial systems, strategic planning, investment management (real estate, private equity), IFRS accounting, reporting, and financial transparency." },
+        { title: "Operational Excellence", description: "Optimization of operational frameworks, standardization of business processes, implementation of Shared Services Centers (SSC), ERP implementation, efficiency improvements." },
+        { title: "Strategic Transformation", description: "Management of complex M&A, leadership of large-scale organizational changes, management of strategic carve-outs and divestitures (e.g., Infracore CHF 1.1B)." },
+        { title: "Stakeholder Management", description: "Exceptional skills in managing relationships with investors, board members, and operational teams to ensure strategic alignment." },
+        { title: "AI & Technological Integration", description: "Expertise in implementing ERP (Oracle, SAP), BI (QlikSense), middleware, and driving digital transformation, including AI applications (prompt engineering, agent coding)." },
+        { title: "Multilingual Capabilities", description: "Professional proficiency in English, French, and German (B2+). Native Croatian speaker. Ability to operate effectively in international environments." }
+    ];
+
+    return (
+        <section id="skills" className={`py-16 md:py-24 ${bgColor} transition-colors duration-300`}>
+            <div className="container mx-auto px-6">
+                <h2 ref={refHeading} className={`text-3xl font-semibold text-center ${headingColor} mb-12 ${animationHeading}`}>Core Competencies</h2>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    {skillsData.map((skill, index) => (
+                        <SkillCard key={skill.title} title={skill.title} delay={ (index % 3) * 100}>
+                            {skill.description}
+                        </SkillCard>
+                    ))}
+                </div>
+            </div>
+        </section>
+    );
+};
+
+// Composant Section Compétences Techniques
+const TechProficiencies = () => {
+    const { theme } = useTheme();
+    const bgColor = theme === 'light' ? 'bg-[#eee8d5]' : 'bg-[#073642]'; // Base2 light, Base02 dark
+    const headingColor = theme === 'light' ? 'text-[#073642]' : 'text-[#eee8d5]'; // Base02 light, Base2 dark
+    const textColor = theme === 'light' ? 'text-[#586e75]' : 'text-[#93a1a1]'; // Base01 light, Base01 dark
+    const iconColor = theme === 'light' ? 'text-[#268bd2]' : 'text-[#2aa198]'; // Blue light, Cyan dark
+
+    const [refHeading, animationHeading] = useScrollAnimation();
+    const [refAI, animationAI] = useScrollAnimation({ threshold: 0.1, triggerOnce: true });
+    const [refSystems, animationSystems] = useScrollAnimation({ threshold: 0.1, triggerOnce: true });
+
+    return (
+        <section id="tech" className={`py-16 md:py-24 ${bgColor} transition-colors duration-300`}>
+            <div className="container mx-auto px-6">
+                <h2 ref={refHeading} className={`text-3xl font-semibold text-center ${headingColor} mb-12 ${animationHeading}`}>Technical Proficiencies</h2>
+                <div className={`max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-8 ${textColor}`}>
+                    <div ref={refAI} className={animationAI} style={{ transitionDelay: '100ms' }}>
+                        <h3 className={`text-xl font-semibold ${headingColor} mb-3 flex items-center`}><Brain size={24} className={`mr-3 ${iconColor}`} /> Artificial Intelligence</h3>
+                        <ul className="list-disc list-inside ml-4 space-y-1">
+                            <li>AI Platforms: OpenAI, Anthropic, xAI, Gemini for analytics & strategy</li>
+                            <li>Concepts: Prompt Engineering, Agent Coding</li>
+                            <li>Application: Enhancing investment strategies, operational efficiency</li>
+                        </ul>
+                    </div>
+                    <div ref={refSystems} className={animationSystems} style={{ transitionDelay: '200ms' }}>
+                        <h3 className={`text-xl font-semibold ${headingColor} mb-3 flex items-center`}><Cog size={24} className={`mr-3 ${iconColor}`} /> Enterprise Systems</h3>
+                         <ul className="list-disc list-inside ml-4 space-y-1">
+                            <li>ERP: Oracle, SAP (Implementation & Management)</li>
+                            <li>BI Tools: QlikSense (Data Warehousing, Reporting)</li>
+                            <li>Middleware: Custom solutions for system integration (e.g., Project Fluance)</li>
+                            <li>Consolidation: SAP BPC</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+    );
+};
+
+// Composant Section Éducation
+const Education = () => {
+    const { theme } = useTheme();
+    const bgColor = theme === 'light' ? 'bg-[#fdf6e4]' : 'bg-[#002b36]'; // Base3 light, Base03 dark
+    const headingColor = theme === 'light' ? 'text-[#073642]' : 'text-[#eee8d5]'; // Base02 light, Base2 dark
+    const cardBg = theme === 'light' ? 'bg-[#eee8d5]' : 'bg-[#073642]'; // Base2 light, Base02 dark
+    const cardHeadingColor = theme === 'light' ? 'text-[#268bd2]' : 'text-[#2aa198]'; // Blue light, Cyan dark
+    const cardTextColor = theme === 'light' ? 'text-[#657b83]' : 'text-[#93a1a1]'; // Base00 light, Base01 dark
+    const borderColor = theme === 'light' ? 'border-[#93a1a1]/30' : 'border-[#586e75]/30'; // Base1 light, Base1 dark
+
+    const [refHeading, animationHeading] = useScrollAnimation();
+    const [refCard1, animationCard1] = useScrollAnimation({ threshold: 0.1, triggerOnce: true });
+    const [refCard2, animationCard2] = useScrollAnimation({ threshold: 0.1, triggerOnce: true });
+
+    return (
+        <section id="education" className={`py-16 md:py-24 ${bgColor} transition-colors duration-300`}>
+            <div className="container mx-auto px-6">
+                <h2 ref={refHeading} className={`text-3xl font-semibold text-center ${headingColor} mb-12 ${animationHeading}`}>Education & Development</h2>
+                <div className={`max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8 ${cardTextColor}`}>
+                    <div ref={refCard1} className={`${cardBg} p-6 rounded-lg shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col h-full border ${borderColor} ${animationCard1}`} style={{ transitionDelay: '100ms' }}>
+                        <h3 className={`text-xl font-semibold ${cardHeadingColor} mb-3 flex items-center`}><GraduationCap size={24} className="mr-3"/>Formal Education</h3>
+                         <ul className="list-disc list-inside ml-4 space-y-2 flex-grow">
+                            <li>HEC Lausanne, University of Lausanne (1995-1998): Advanced coursework in Business Administration (Finance, Management, Economics).</li>
+                            <li>Maturité Fédérale E, Switzerland (1995): Rigorous secondary education focused on economics.</li>
+                        </ul>
+                    </div>
+                    <div ref={refCard2} className={`${cardBg} p-6 rounded-lg shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col h-full border ${borderColor} ${animationCard2}`} style={{ transitionDelay: '200ms' }}>
+                        <h3 className={`text-xl font-semibold ${cardHeadingColor} mb-3 flex items-center`}><Briefcase size={24} className="mr-3"/>Executive & Continuous Learning</h3>
+                        <ul className="list-disc list-inside ml-4 space-y-2 flex-grow">
+                            <li>IMD Lausanne (2010-2012): Executive courses strengthening strategic leadership and corporate governance.</li>
+                            <li>Continuous Development (2013-Present): Specialized courses in AI applications (OpenAI, Anthropic, xAI), healthcare regulations, and operational excellence.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+    );
+};
+
+// Composant Carte d'Expérience
+const ExperienceCard = ({ title, company, dates, children, delay = 0 }) => {
+    const { theme } = useTheme();
+    const cardBg = theme === 'light' ? 'bg-[#fdf6e4]' : 'bg-[#002b36]'; // Base3 light, Base03 dark
+    const headingColor = theme === 'light' ? 'text-[#073642]' : 'text-[#eee8d5]'; // Base02 light, Base2 dark
+    const dateColor = theme === 'light' ? 'text-[#839496]' : 'text-[#657b83]'; // Base0 light, Base0 dark
+    const textColor = theme === 'light' ? 'text-[#586e75]' : 'text-[#93a1a1]'; // Base01 light, Base01 dark
+    const borderColor = theme === 'light' ? 'border-[#93a1a1]/30' : 'border-[#586e75]/30'; // Base1 light, Base1 dark
+
+    const [ref, animationClasses] = useScrollAnimation({ threshold: 0.1, triggerOnce: true });
+
+    return (
+        <div ref={ref} className={`${cardBg} p-6 rounded-lg shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col h-full border ${borderColor} ${animationClasses}`} style={{ transitionDelay: `${delay}ms` }}>
+            <h3 className={`text-xl font-semibold ${headingColor} mb-1`}>{title}</h3>
+            <p className={`text-sm ${dateColor} mb-3`}>{company} | {dates}</p>
+            <ul className={`${textColor} space-y-1 card-list flex-grow`}>
+                {children}
+            </ul>
+        </div>
+    );
+};
+
+// Composant Section Expérience Significative
+const Experience = () => {
+    const { theme } = useTheme();
+    const bgColor = theme === 'light' ? 'bg-[#eee8d5]' : 'bg-[#073642]'; // Base2 light, Base02 dark
+    const headingColor = theme === 'light' ? 'text-[#073642]' : 'text-[#eee8d5]'; // Base02 light, Base2 dark
+
+    const [refHeading, animationHeading] = useScrollAnimation();
+
+    const experiences = [
+        { title: "Chief Operating Officer", company: "BE Capital SA", dates: "Oct 2023 - Present", details: ["Oversee asset allocation & performance (Family Office).", "Advisor to the principal shareholder of Investis Holding SA.", "Process optimization (CHF 2M annual savings).", "Preparing new carve-out and IPO (REIT)."] },
+        { title: "Chief Financial Officer", company: "Investis Holding SA", dates: "Oct 2021 - Oct 2023", details: ["Created Valores Shared Service Center (Finance, HR, IT).", "CHF 10M annual savings via centralization.", "Led sale of Real Estate Services (CHF 240M).", "ERP implementation, improved EBITDA margin (+15%)."] },
+        { title: "Chief Executive Officer", company: "Infracore SA (AEVIS Victoria)", dates: "May 2018 - Oct 2021", details: ["Executed carve-out and sale (CHF 1.1B) to La Baloise/MPT.", "Managed 40 properties (~180,000 sqm).", "Implemented BI tools (-10% operational costs).", "Raised institutional capital."] },
+        { title: "CFO / COO (Previous Roles)", company: "AEVIS Victoria / Swiss Medical Network", dates: "2014 - 2018", details: ["Standardized operations and financial processes.", "Post-acquisition financial integration (network grew from 11 to 20 hospitals).", "BI projects and procurement optimization (CHF 17M savings).", "Implemented scalable platforms."] }
+    ];
+
+    return (
+        <section id="experience" className={`py-16 md:py-24 ${bgColor} transition-colors duration-300`}>
+            <div className="container mx-auto px-6">
+                <h2 ref={refHeading} className={`text-3xl font-semibold text-center ${headingColor} mb-12 ${animationHeading}`}>Significant Experience</h2>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8"> {/* Changed to 2 columns for better readability */}
+                    {experiences.map((exp, index) => (
+                        <ExperienceCard key={exp.title + exp.company} title={exp.title} company={exp.company} dates={exp.dates} delay={(index % 2) * 100}>
+                            {exp.details.map(detail => <li key={detail}>{detail}</li>)}
+                        </ExperienceCard>
+                    ))}
+                </div>
+            </div>
+        </section>
+    );
+};
+
+// Composant Élément de la Timeline
+const TimelineItem = ({ title, company, location, dates, description, isCurrent = false }) => {
+    const { theme } = useTheme();
+    const headingColor = theme === 'light' ? 'text-[#073642]' : 'text-[#eee8d5]'; // Base02 light, Base2 dark
+    const dateColor = theme === 'light' ? 'text-[#839496]' : 'text-[#657b83]'; // Base0 light, Base0 dark
+    const textColor = theme === 'light' ? 'text-[#586e75]' : 'text-[#93a1a1]'; // Base01 light, Base01 dark
+    const iconBg = theme === 'light' ? 'bg-[#268bd2]' : 'bg-[#2aa198]'; // Blue light, Cyan dark
+    const iconBorder = theme === 'light' ? 'border-[#fdf6e4]' : 'border-[#002b36]'; // Base3 light, Base03 dark
+
+    const [ref, animationClasses] = useScrollAnimation({ threshold: 0.1, triggerOnce: true });
+
+    return (
+        <div ref={ref} className={`timeline-item ${animationClasses}`}>
+            {isCurrent && <div className={`timeline-icon ${iconBg} ${iconBorder}`}></div>}
+            <h3 className={`text-xl font-semibold ${headingColor} mb-1`}>{title}</h3>
+            <p className={`text-sm font-medium ${dateColor} mb-2`}>{company} | {location} | {dates}</p>
+            <p className={textColor}>{description}</p>
+        </div>
+    );
+};
+
+
+// Composant Section Timeline
+const Timeline = () => {
+    const { theme } = useTheme();
+    const bgColor = theme === 'light' ? 'bg-[#fdf6e4]' : 'bg-[#002b36]'; // Base3 light, Base03 dark
+    const headingColor = theme === 'light' ? 'text-[#073642]' : 'text-[#eee8d5]'; // Base02 light, Base2 dark
+
+    const [refHeading, animationHeading] = useScrollAnimation();
+
+    const timelineData = [
+        { title: "Chief Operating Officer", company: "BE Capital SA", location: "Lausanne", dates: "Oct 2023 - Present", description: "Oversee asset strategy for family office, advise principal shareholder of Investis Holding SA, drive process optimization (CHF 2M savings), prepare new REIT IPO.", isCurrent: true },
+        { title: "Chief Financial Officer, Real Estate Services", company: "Investis Holding SA", location: "Zurich", dates: "Oct 2021 - Oct 2023", description: "Created Valores Shared Service Center (Finance, HR, IT), achieving CHF 10M annual savings. Led CHF 240M sale of Real Estate Services. Implemented ERP, improving EBITDA margins by 15%." },
+        { title: "Chief Executive Officer", company: "Infracore SA (AEVIS Victoria Group)", location: "Fribourg", dates: "May 2018 - Oct 2021", description: "Led CHF 1.1B carve-out and sale to La Baloise/Medical Properties Trust. Managed 40 properties (~180,000 sqm). Implemented BI tools, reducing operational costs by 10%." },
+        { title: "Chief Operating Officer", company: "AEVIS VICTORIA SA", location: "Zurich", dates: "May 2016 - May 2018", description: "Standardized operations across subsidiaries, saving over CHF 5M via process alignment. Built scalable platforms and fostered a unified culture." },
+        { title: "Chief Financial Officer", company: "Swiss Medical Network SA (AEVIS Victoria Group)", location: "Genolier", dates: "Apr 2014 - May 2016", description: "Integrated ERP (Project Oxygen, -20% DSO), led BI initiative (-7-10% costs), unified procurement (CHF 17M savings), expanded network (11 to 20 hospitals), implemented middleware (Project Fluance)." },
+        { title: "Projects Finance Manager", company: "Boart Longyear", location: "Switzerland", dates: "2011 - 2014", description: "Directed complex global financial consolidations and participated in Oracle ERP rollout (Project OneCore)." },
+        { title: "Finance & Accounting Manager", company: "Navori Labs", location: "Lausanne", dates: "2009 - 2011", description: "Managed end-to-end financial planning, reporting, and audits (FP&A focus)." }
+    ];
+
+    return (
+        <section id="timeline" className={`py-16 md:py-24 ${bgColor} transition-colors duration-300`}>
+            <div className="container mx-auto px-6">
+                <h2 ref={refHeading} className={`text-3xl font-semibold text-center ${headingColor} mb-16 ${animationHeading}`}>Career Timeline</h2>
+                <div className="relative max-w-3xl mx-auto">
+                    {timelineData.map((item, index) => (
+                        <TimelineItem key={index} {...item} />
+                    ))}
+                </div>
+            </div>
+        </section>
+    );
+};
+
+// Composant Section Contact
+const Contact = () => {
+    const { theme } = useTheme();
+    const gradientFrom = theme === 'light' ? 'from-[#2aa198]' : 'from-[#073642]'; // Cyan light, Base02 dark
+    const gradientTo = theme === 'light' ? 'to-[#268bd2]' : 'to-[#002b36]'; // Blue light, Base03 dark
+    const headingColor = theme === 'light' ? 'text-white' : 'text-[#eee8d5]'; // White light, Base2 dark
+    const textColor = theme === 'light' ? 'text-[#eee8d5]' : 'text-[#93a1a1]'; // Base2 light, Base01 dark
+    const linkColor = theme === 'light' ? 'text-[#fdf6e4]' : 'text-[#eee8d5]'; // Base3 light, Base2 dark
+    const hoverColor = theme === 'light' ? 'hover:text-[#b58900]' : 'hover:text-[#b58900]'; // Yellow hover for both
+    const buttonBg = theme === 'light' ? 'bg-[#b58900]' : 'bg-[#2aa198]'; // Yellow light, Cyan dark
+    const buttonText = theme === 'light' ? 'text-[#fdf6e4]' : 'text-[#002b36]'; // Base3 light, Base03 dark
+    const buttonHoverBg = theme === 'light' ? 'hover:bg-[#cb4b16]' : 'hover:bg-[#859900]'; // Orange light, Green dark
+
+    const [refHeading, animationHeading] = useScrollAnimation();
+    const [refP1, animationP1] = useScrollAnimation({ threshold: 0.1, triggerOnce: true });
+    const [refDiv, animationDiv] = useScrollAnimation({ threshold: 0.1, triggerOnce: true });
+    const [refButton, animationButton] = useScrollAnimation({ threshold: 0.1, triggerOnce: true });
+    const [refP2, animationP2] = useScrollAnimation({ threshold: 0.1, triggerOnce: true });
+
+
+    // --- IMPORTANT: Replace with the actual path to your downloadable CV ---
+    const cvPath = "/daniel_jandric_cv.pdf"; // Example path
+    // -----------------------------------------------------------------------
+
+    return (
+        <section id="contact" className={`py-16 md:py-24 bg-gradient-to-r ${gradientFrom} ${gradientTo} text-[#fdf6e4] transition-colors duration-300`}>
+            <div className="container mx-auto px-6 text-center">
+                <h2 ref={refHeading} className={`text-3xl font-semibold mb-8 ${headingColor} ${animationHeading}`}>Contact Me</h2>
+                <p ref={refP1} className={`text-lg mb-4 ${textColor} ${animationP1}`} style={{ transitionDelay: '100ms' }}>Let's discuss how I can bring value to your organization. Ready for new challenges and opportunities.</p>
+                <div ref={refDiv} className={`flex flex-col md:flex-row justify-center items-center space-y-4 md:space-y-0 md:space-x-8 text-lg ${linkColor} ${animationDiv}`} style={{ transitionDelay: '200ms' }}>
+                    <a href="mailto:daniel.jandric@me.com" className={`${hoverColor} hover:underline transition-colors duration-200 flex items-center`}><Mail size={18} className="mr-2"/>daniel.jandric@me.com</a>
+                    <span className="flex items-center"><Phone size={18} className="mr-2"/>+41 79 865 52 50</span>
+                    <a href="https://linkedin.com/in/daniel-jandric-b7194840" target="_blank" rel="noopener noreferrer" className={`${hoverColor} hover:underline transition-colors duration-200 flex items-center`}><Linkedin size={18} className="mr-2"/>LinkedIn Profile</a>
+                </div>
+                 {/* CV Download Button */}
+                 <div ref={refButton} className={`mt-10 ${animationButton}`} style={{ transitionDelay: '300ms' }}>
+                    <a href={cvPath} download="Daniel_Jandric_CV.pdf"
+                       className={`inline-block ${buttonBg} ${buttonText} ${buttonHoverBg} font-semibold py-3 px-8 rounded-lg transition-colors duration-200 shadow-md hover:shadow-lg transform hover:-translate-y-0.5`}>
+                        Download CV (PDF)
+                    </a>
+                 </div>
+                <p ref={refP2} className={`mt-8 text-sm ${textColor} ${animationP2}`} style={{ transitionDelay: '400ms' }}><MapPin size={14} className="inline mr-1"/>Based in Echichens, Switzerland</p>
+            </div>
+        </section>
+    );
+};
+
+// Composant Footer
+const Footer = () => {
+    const { theme } = useTheme();
+    const bgColor = theme === 'light' ? 'bg-[#eee8d5]' : 'bg-[#073642]'; // Base2 light, Base02 dark
+    const textColor = theme === 'light' ? 'text-[#839496]' : 'text-[#657b83]'; // Base0 light, Base0 dark
+
+    return (
+        <footer className={`${bgColor} text-[#839496] py-6 transition-colors duration-300`}>
+            <div className="container mx-auto px-6 text-center text-sm">
+                &copy; {new Date().getFullYear()} Daniel Jandric. All rights reserved.
+            </div>
+        </footer>
+    );
+};
+
+
+// --- Main App Component ---
+function App() {
+  return (
+    // Fournir le contexte de thème à toute l'application
+    <ThemeProvider>
+        {/* Utiliser une div racine pour s'assurer que le thème s'applique */}
+        <div className="antialiased">
+          <Navbar />
+          <Hero />
+          <About />
+          <Skills />
+          <TechProficiencies />
+          <Education />
+          <Experience />
+          <Timeline />
+          <Contact />
+          <Footer />
+        </div>
+    </ThemeProvider>
+  );
+}
+
+export default App; // Exporter le composant App principal
